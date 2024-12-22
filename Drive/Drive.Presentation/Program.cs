@@ -25,10 +25,10 @@ namespace Drive.Presentation
                 switch (choice)
                 {
                     case 1:
-
+                        Console.Clear();
                         break;
                     case 2:
-
+                        Console.Clear();
                         break;
                     case 3:
                         menuForLoginAndRegistration = false;
