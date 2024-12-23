@@ -8,5 +8,6 @@ namespace Drive.Presentation.Actions.LogIn
 {
     public class LogInAction
     {
+
     }
 }

@@ -4,8 +4,6 @@ using Drive.Data.Entities.Models.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
-using System.Reflection.Emit;
 
 namespace Drive.Data.Entities
 {
