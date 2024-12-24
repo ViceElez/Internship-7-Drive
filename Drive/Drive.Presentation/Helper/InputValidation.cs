@@ -35,9 +35,10 @@ namespace Drive.Presentation.Helper
 
         public static bool IsValid(string email)
         {
-            string regex = @"^[^@\s]+@[^@\s]+\.[a-zA-Z]+$";
+            string regex = @"^[^\s@]+@[^\s@]+\.[^\s@]{3,}$";
 
             return Regex.IsMatch(email, regex, RegexOptions.IgnoreCase);
         }
+
     }
 }

@@ -9,7 +9,6 @@ namespace Drive.Data.Entities
 {
     public class DriveDbContext : DbContext
     {
-
         public DriveDbContext(DbContextOptions<DriveDbContext> options) : base(options)
         {
         }
@@ -43,6 +42,13 @@ namespace Drive.Data.Entities
 
             Seed.DatabaseSeeder.Seed(modelBuilder);
             base.OnModelCreating(modelBuilder);
+        }
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=Drive;User Id=postgres;Password=gR4)0Lo2Q;");
+            }
         }
 
     }

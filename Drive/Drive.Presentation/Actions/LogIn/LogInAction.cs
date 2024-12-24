@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Drive.Domain.Repositories;
+using Drive.Presentation.Actions.Menus;
+
 
 namespace Drive.Presentation.Actions.LogIn
 {
@@ -27,7 +25,7 @@ namespace Drive.Presentation.Actions.LogIn
                     {
                         Console.WriteLine("Proces logina je prekinut.");
                         Console.ReadKey();
-                        return;
+                        MainMenuActions.MainMenu();
                     }
                 }
                 else if (!Helper.InputValidation.IsValid(loginEmail))
@@ -43,10 +41,10 @@ namespace Drive.Presentation.Actions.LogIn
                     {
                         Console.WriteLine("Proces logina je prekinut.");
                         Console.ReadKey();
-                        return;
+                        MainMenuActions.MainMenu();
                     }
                 }
-                else if (false)//samo u domain napravi za provejeru
+                else if (!Drive.Domain.Repositories.UserRepository.EmailExists(loginEmail))
                 {
                     Console.WriteLine("Ne postoji racun s tim emailom");
                     var confirmForEmail = Helper.InputValidation.ConfirmAndDelete();
@@ -59,7 +57,7 @@ namespace Drive.Presentation.Actions.LogIn
                     {
                         Console.WriteLine("Proces logina je prekinut.");
                         Console.ReadKey();
-                        return;
+                        MainMenuActions.MainMenu();
                     }
 
                 }
@@ -84,18 +82,32 @@ namespace Drive.Presentation.Actions.LogIn
                     {
                         Console.WriteLine("Proces logina je prekinut.");
                         Console.ReadKey();
-                        return;
+                        MainMenuActions.MainMenu();
+                    }
+                }
+                else if(!Drive.Domain.Repositories.UserRepository.ConfirmPassword(loginEmail,loginPassword)){
+                    Console.WriteLine("Pogresna lozinka");
+                    Thread.Sleep(30000);
+                    var confirmForPassword = Helper.InputValidation.ConfirmAndDelete();
+                    if (confirmForPassword)
+                    {
+                        Console.Write("Unesite lozinku:");
+                        loginPassword = Console.ReadLine().Trim();
+                    }
+                    else
+                    {
+                        Console.WriteLine("Proces logina je prekinut.");
+                        Console.ReadKey();
+                        MainMenuActions.MainMenu();
                     }
                 }
                 else
                     break;
             }
-
-            //provjeri u domainu
-            //ako je sve ok onda se prikaze menu
             Console.WriteLine("Uspjesno logirani.");
             Console.ReadKey();
-            Drive.Presentation.Actions.Menus.DriveMenuActions.DriveMenu();
+            var loggedUser = UserRepository.GetUserByEmail(loginEmail);
+            DriveMenuActions.DriveMenu(loggedUser);
         }
     }
 }

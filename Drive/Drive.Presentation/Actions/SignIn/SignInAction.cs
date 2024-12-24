@@ -1,4 +1,5 @@
-﻿
+﻿using Drive.Domain.Repositories;
+using Drive.Presentation.Actions.Menus;
 namespace Drive.Presentation.Actions.SignIn
 {
     public class SignInAction
@@ -22,7 +23,7 @@ namespace Drive.Presentation.Actions.SignIn
                     {
                         Console.WriteLine("Proces registracije je prekinut.");
                         Console.ReadKey();
-                        return;
+                        MainMenuActions.MainMenu();
                     }
                 }
                 else if (!Helper.InputValidation.IsValid(registrationEmail))
@@ -38,10 +39,10 @@ namespace Drive.Presentation.Actions.SignIn
                     {
                         Console.WriteLine("Proces registracije je prekinut.");
                         Console.ReadKey();
-                        return;
+                        MainMenuActions.MainMenu();
                     }
                 }
-                else if (false)//samo u domain napravi za provejeru
+                else if (Drive.Domain.Repositories.UserRepository.EmailExists(registrationEmail))
                 {
                     Console.WriteLine("Vec postoji racun s tim emailom");
                     var confirmForEmail = Helper.InputValidation.ConfirmAndDelete();
@@ -54,7 +55,7 @@ namespace Drive.Presentation.Actions.SignIn
                     {
                         Console.WriteLine("Proces registracije je prekinut.");
                         Console.ReadKey();
-                        return;
+                        MainMenuActions.MainMenu();
                     }
 
                 }
@@ -80,7 +81,7 @@ namespace Drive.Presentation.Actions.SignIn
                     {
                         Console.WriteLine("Proces registracije je prekinut.");
                         Console.ReadKey();
-                        return;
+                        MainMenuActions.MainMenu();
                     }
                 }
                 else
@@ -89,7 +90,7 @@ namespace Drive.Presentation.Actions.SignIn
                 }
             }
 
-            Console.WriteLine("Upisite ponovno lozinku za registraciju:");
+            Console.Write("Upisite ponovno lozinku za registraciju:");
             var registrationPasswordRepeat = Console.ReadLine().Trim();
             while (true)
             {
@@ -106,7 +107,7 @@ namespace Drive.Presentation.Actions.SignIn
                     {
                         Console.WriteLine("Proces registracije je prekinut.");
                         Console.ReadKey();
-                        return;
+                        MainMenuActions.MainMenu();
                     }
                 }
                 else if (registrationPassword != registrationPasswordRepeat)
@@ -122,7 +123,7 @@ namespace Drive.Presentation.Actions.SignIn
                     {
                         Console.WriteLine("Proces registracije je prekinut.");
                         Console.ReadKey();
-                        return;
+                        MainMenuActions.MainMenu();
                     }
                 }
                 else
@@ -131,12 +132,54 @@ namespace Drive.Presentation.Actions.SignIn
                 }
             }
 
+            var generatedCaptcha=Drive.Domain.Repositories.UserRepository.GenerateCaptcha();
+            Console.WriteLine($"{generatedCaptcha}");
+            Console.Write("Upisite captcha kod:");
+            var enteredCaptcha = Console.ReadLine().Trim();
+            while (true)
+            {
+                if (string.IsNullOrEmpty(enteredCaptcha))
+                {
+                    Console.WriteLine("Captcha nemoze biti prazna.");
+                    var confirmForCaptcha = Helper.InputValidation.ConfirmAndDelete();
+                    if (confirmForCaptcha)
+                    {
+                        Console.Write("Unesite captcha kod:");
+                        enteredCaptcha = Console.ReadLine().Trim();
+                    }
+                    else
+                    {
+                        Console.WriteLine("Proces registracije je prekinut.");
+                        Console.ReadKey();
+                        MainMenuActions.MainMenu();
+                    }
+                }
+                else if (!Drive.Domain.Repositories.UserRepository.CheckCaptcha(generatedCaptcha,enteredCaptcha))
+                {
+                    Console.WriteLine("Captcha kodovi se ne podudaraju.");
+                    var confirmForCaptcha = Helper.InputValidation.ConfirmAndDelete();
+                    if (confirmForCaptcha)
+                    {
+                        Console.Write("Unesite captcha kod:");
+                        enteredCaptcha = Console.ReadLine().Trim();
+                    }
+                    else
+                    {
+                        Console.WriteLine("Proces registracije je prekinut.");
+                        Console.ReadKey();
+                        MainMenuActions.MainMenu();
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
             Console.WriteLine("Uspjesno registrirani!");
             Console.ReadKey();
-
-            //spremi u bazu
-
-            Drive.Presentation.Actions.Menus.DriveMenuActions.DriveMenu();
+            Drive.Domain.Repositories.UserRepository.AddUser(registrationEmail, registrationPassword);
+            var registeredUser = Drive.Domain.Repositories.UserRepository.GetUserByEmail(registrationEmail);
+            DriveMenuActions.DriveMenu(registeredUser);
 
 
 
