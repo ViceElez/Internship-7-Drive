@@ -85,7 +85,8 @@ namespace Drive.Presentation.Actions.LogIn
                         MainMenuActions.MainMenu();
                     }
                 }
-                else if(!Drive.Domain.Repositories.UserRepository.ConfirmPassword(loginEmail,loginPassword)){
+                else if (!Drive.Domain.Repositories.UserRepository.ConfirmPassword(loginEmail, loginPassword))
+                {
                     Console.WriteLine("Pogresna lozinka");
                     Thread.Sleep(30000);
                     var confirmForPassword = Helper.InputValidation.ConfirmAndDelete();

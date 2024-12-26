@@ -131,7 +131,7 @@ namespace Drive.Presentation.Actions.SignIn
                 }
             }
 
-            var generatedCaptcha=Drive.Domain.Repositories.UserRepository.GenerateCaptcha();
+            var generatedCaptcha = Drive.Domain.Repositories.UserRepository.GenerateCaptcha();
             Console.WriteLine($"{generatedCaptcha}");
             Console.Write("Upisite captcha kod:");
             var enteredCaptcha = Console.ReadLine().Trim();
@@ -153,7 +153,7 @@ namespace Drive.Presentation.Actions.SignIn
                         MainMenuActions.MainMenu();
                     }
                 }
-                else if (!Drive.Domain.Repositories.UserRepository.CheckCaptcha(generatedCaptcha,enteredCaptcha))
+                else if (!Drive.Domain.Repositories.UserRepository.CheckCaptcha(generatedCaptcha, enteredCaptcha))
                 {
                     Console.WriteLine("Captcha kodovi se ne podudaraju.");
                     var confirmForCaptcha = Helper.InputValidation.ConfirmAndDelete();

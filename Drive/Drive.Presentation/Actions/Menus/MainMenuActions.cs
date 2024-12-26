@@ -13,13 +13,13 @@ namespace Drive.Presentation.Actions.Menus
             var menu = new DriveMenu(options);
             int selectedOption = menu.Run();
 
-            
+
 
             switch (selectedOption)
             {
                 case 0:
                     Console.Clear();
-                   LogInAction.UserLogInAction();
+                    LogInAction.UserLogInAction();
                     break;
                 case 1:
                     Console.Clear();

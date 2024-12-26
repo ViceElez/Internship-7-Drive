@@ -9,9 +9,9 @@ namespace Drive.Domain.Factories
 
         public static DriveDbContext GetDriveDbContext()
         {
-           var options = new DbContextOptionsBuilder<DriveDbContext>()
-                .UseNpgsql(ConfigurationManager.ConnectionStrings["Drive"].ConnectionString)
-                .Options;
+            var options = new DbContextOptionsBuilder<DriveDbContext>()
+                 .UseNpgsql(ConfigurationManager.ConnectionStrings["Drive1"].ConnectionString)
+                 .Options;
 
             return new DriveDbContext(options);
         }

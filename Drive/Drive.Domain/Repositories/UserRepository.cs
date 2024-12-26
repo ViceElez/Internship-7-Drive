@@ -61,7 +61,7 @@ namespace Drive.Domain.Repositories
         }
 
 
-        public static bool CheckCaptcha(string generatedCaptcha,string enteredCaptcha)
+        public static bool CheckCaptcha(string generatedCaptcha, string enteredCaptcha)
         {
             if (generatedCaptcha == enteredCaptcha)
             {

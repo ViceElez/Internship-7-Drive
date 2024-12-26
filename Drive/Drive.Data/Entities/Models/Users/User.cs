@@ -12,7 +12,7 @@ namespace Drive.Data.Entities.Models.Users
 
         public User(int ID, string email, string password)
         {
-            Id = ID; //odi bi tribalo slat user.count++ 
+            Id = ID;
             Email = email;
             Password = password;
         }

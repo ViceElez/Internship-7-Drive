@@ -47,7 +47,7 @@ namespace Drive.Data.Entities
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=Drive;User Id=postgres;Password=gR4)0Lo2Q;");
+                optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=Drive1;User Id=postgres;Password=gR4)0Lo2Q;");
             }
         }
 
@@ -58,12 +58,12 @@ namespace Drive.Data.Entities
         public DriveDbContext CreateDbContext(string[] args)
         {
             var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory()) 
+                .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("C:\\Users\\leona\\Desktop\\Vice\\dumpInternship-2425\\Internship-7-Drive\\Drive\\Drive.Presentation\\appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
-            var connectionString = configuration.GetConnectionString("Drive");
-         
+            var connectionString = configuration.GetConnectionString("Drive1");
+
             var optionsBuilder = new DbContextOptionsBuilder<DriveDbContext>();
             optionsBuilder.UseNpgsql(connectionString);
 

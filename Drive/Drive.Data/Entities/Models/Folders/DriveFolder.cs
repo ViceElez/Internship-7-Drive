@@ -12,13 +12,16 @@ namespace Drive.Data.Entities.Models.Folders
         public DateTime CreatedAt { get; set; }
         public int FolderUserId { get; set; }
         public User FolderUser { get; set; }
-        public int ParentFolderId { get; set; }
+        public int? ParentFolderId { get; set; }
         public DriveFolder ParentFolder { get; set; }
 
-        public DriveFolder(int ID, string name)
+        public DriveFolder(int ID, string name, int FolderUserID,int FolderParentID)
         {
-            Id = ID; //odi bi tribalo slat folder.count++ 
+            Id = ID;
             Name = name;
+            CreatedAt = DateTime.Now;
+            FolderUserId = FolderUserID;
+            ParentFolderId = FolderParentID;
         }
         public DriveFolder()
         {

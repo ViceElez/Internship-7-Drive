@@ -4,10 +4,12 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace Drive.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class MigrationName : Migration
+    public partial class CreatingMigrationAndSeedingData : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -35,7 +37,7 @@ namespace Drive.Data.Migrations
                     Name = table.Column<string>(type: "text", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     FolderUserId = table.Column<int>(type: "integer", nullable: false),
-                    ParentFolderId = table.Column<int>(type: "integer", nullable: false)
+                    ParentFolderId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -64,7 +66,7 @@ namespace Drive.Data.Migrations
                     Text = table.Column<string>(type: "text", nullable: false),
                     FileUserId = table.Column<int>(type: "integer", nullable: false),
                     LastChanges = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    FolderId = table.Column<int>(type: "integer", nullable: false)
+                    FolderId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -82,6 +84,51 @@ namespace Drive.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "Email", "Password" },
+                values: new object[,]
+                {
+                    { 1, "ivana@vip.com", "password123" },
+                    { 2, "josip@yahoo.pro", "password456" },
+                    { 3, "mario@abc.com", "password789" },
+                    { 4, "luka@gmail.com", "password000" },
+                    { 5, "ana@domain.com", "password111" },
+                    { 6, "nikola@company.com", "password222" }
+                });
+
+            migrationBuilder.InsertData(
+              table: "driveFiles",
+              columns: new[] { "Id", "FileUserId", "FolderId", "LastChanges", "Name", "Text" },
+              values: new object[,]
+              {
+                { 1, 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Resume.pdf", "Resume content" },
+                { 2, 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "ProjectPlan.docx", "Project Plan content" },
+                { 3, 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Budget.xlsx", "Budget content" },
+                { 4, 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Hobbies.txt", "Hobbies content" },
+                { 5, 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "ToDoList.docx", "ToDo list content" },
+                { 6, 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Notes.txt", "Notes content" },
+                { 7, 3, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Presentation.pptx", "Presentation content" },
+                { 8, 4, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Invoice.pdf", "Invoice content" },
+                { 9, 5, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "MeetingNotes.doc", "Meeting notes content" },
+                { 10, 5, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "ProductDesign.png", "Product design content" },
+                { 11, 6, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "CodeSnippet.cs", "Code snippet content" },
+                { 12, 6, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "SetupGuide.md", "Setup guide content" }
+              });
+
+            migrationBuilder.InsertData(
+                 table: "driveFolders",
+                 columns: new[] { "Id", "CreatedAt", "FolderUserId", "Name", "ParentFolderId" },
+                 values: new object[,]
+                 {
+                    { 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, "Work", null },
+                    { 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, "Personal", null },
+                    { 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, "Projects", 1 },
+                    { 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 3, "Finance", 1 },
+                    { 5, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 5, "Designs", null },
+                    { 6, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 6, "Development", null }
+                 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_driveFiles_FileUserId",
