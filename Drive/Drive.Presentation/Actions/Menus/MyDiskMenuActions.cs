@@ -1,4 +1,5 @@
 ﻿using Drive.Data.Entities.Models.Users;
+using Drive.Domain.Repositories;
 
 namespace Drive.Presentation.Actions.Menus
 {
@@ -7,24 +8,23 @@ namespace Drive.Presentation.Actions.Menus
         public static void MyDiskMenu(User loggedUser)
         {
             while (true)
-            {
+            { //triba kad se folder dodaje da mu dan i parent folder al to implementiraj kad bude tribalo ulazit u mape, i nek se ispise u kojem folderu se nalazis
+                //sve di triba upisat ime filea nek se radi priko id-a
                 Console.Clear();
-                //izlistat sve
+                //Console.WriteLine($"Nalazite se u {} folderu\n");
+                FolderRepositroy.ListAllFolders(loggedUser);
+                FileRepository.ListAllFiles(loggedUser);
                 Console.WriteLine("Upisite komandu za rad s datotekama (ili upisite 'help' za popis komandi):");
                 var commandOption = Console.ReadLine().Trim().ToLower();
 
                 switch (commandOption)
                 {
                     case "stvori mapu":
-                        Console.Write("Upisite ime mape koju zelite stvoriti: ");
-                        var createdFolder = Console.ReadLine().Trim();
-                        // Implementacija stvaranja mape
+                        Drive.Presentation.Actions.Folder.FolderActions.CreateFolder(loggedUser);
                         break;
 
                     case "stvori datoteku":
-                        Console.Write("Upisite ime datoteke koju zelite stvoriti: ");
-                        var createdFile = Console.ReadLine().Trim();
-                        // Implementacija stvaranja datoteke
+                        Drive.Presentation.Actions.File.FileActions.CreateFile(loggedUser);
                         break;
 
                     case "udi u mapu":
@@ -97,5 +97,6 @@ namespace Drive.Presentation.Actions.Menus
                 }
             }
         }
+
     }
 }
