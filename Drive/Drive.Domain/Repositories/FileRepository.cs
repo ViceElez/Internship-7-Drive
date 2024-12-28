@@ -59,23 +59,11 @@ namespace Drive.Domain.Repositories
                 context.SaveChanges();
             }
         }
-        public static void DeleteFileById(User loggedUser, int IdOfFileToDelete)
+        public static void DeleteFile(User loggedUser, int IdOfFileToDelete,string NameOfFileToDelete )
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
-                var file = context.driveFiles.FirstOrDefault(f => f.Id == IdOfFileToDelete && f.FileUserId == loggedUser.Id);
-                if (file != null)
-                {
-                    context.driveFiles.Remove(file);
-                    context.SaveChanges();
-                }
-            }
-        }
-        public static void DeleteFileByName(User loggedUser, string NameOfFileToDelete)
-        {
-            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
-            {
-                var file = context.driveFiles.FirstOrDefault(f => f.Name == NameOfFileToDelete && f.FileUserId == loggedUser.Id);
+                var file = context.driveFiles.FirstOrDefault(f => f.Id == IdOfFileToDelete && f.Name==NameOfFileToDelete && f.FileUserId == loggedUser.Id);
                 if (file != null)
                 {
                     context.driveFiles.Remove(file);
@@ -99,6 +87,18 @@ namespace Drive.Domain.Repositories
                 foreach (var file in files)
                 {
                     Console.WriteLine($"{file.Id}-{file.Name}");
+                }
+            }
+        }
+        public static void ChangeFileName(User loggedUser, string oldFileName, string newFileName, int fileId)
+        {
+            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
+            {
+                var file = context.driveFiles.FirstOrDefault(f => f.Name == oldFileName && f.Id==fileId &&f.FileUserId == loggedUser.Id);
+                if (file != null)
+                {
+                    file.Name = newFileName;
+                    context.SaveChanges();
                 }
             }
         }

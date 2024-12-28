@@ -1,14 +1,9 @@
 ﻿using Drive.Data.Entities.Models.Users;
 using Drive.Presentation.Actions.Menus;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Drive.Presentation.Actions.File
 {
-    public class FileActions
+    public class FileActions // za ove file i foldere brisat triba stavit jednu funkciju samo al da gleda i ime i id filea ili foldera i user id
     {
         public static void CreateFile(User loggedUser)
         {
@@ -50,132 +45,92 @@ namespace Drive.Presentation.Actions.File
                 MyDiskMenuActions.MyDiskMenu(loggedUser);
             }
         }
-        public static void DeleteFIle(User loggedUser)
+        public static void DeleteFile(User loggedUser)
         {
             Console.WriteLine("Upisite ime file-a kojeg zelite izbrisati:");
-            var fileNameToDelete = Console.ReadLine().Trim();
+            var fileNameToDelete = Helper.InputValidation.FileNameValidation(loggedUser);
+            var fileIdToDelete = 0;
+            if (Domain.Repositories.FileRepository.ReturnTheNumberOfFilesWithSamename(loggedUser, fileNameToDelete) > 1)
+                fileIdToDelete = Helper.InputValidation.FileIdValidation(loggedUser, fileNameToDelete);
+
+            if (Helper.InputValidation.ConfirmAndDelete())
+            {
+                Domain.Repositories.FileRepository.DeleteFile(loggedUser, fileIdToDelete,fileNameToDelete);
+                Console.WriteLine("File uspjesno izbrisan.");
+                Console.ReadKey();
+                MyDiskMenuActions.MyDiskMenu(loggedUser);
+            }
+            else
+            {
+                Console.WriteLine("Proces je prekinut.");
+                Console.ReadKey();
+                MyDiskMenuActions.MyDiskMenu(loggedUser);
+            }
+        }
+        public static void ChangeFileName(User loggedUser)
+        {
+            Console.Write("Upisite ime file-a kojem zelite promijeniti ime:");
+            var fileName=Helper.InputValidation.FileNameValidation( loggedUser);
+
+            var IdOfFile = 0;
+            if (Domain.Repositories.FileRepository.ReturnTheNumberOfFilesWithSamename(loggedUser, fileName) > 1)
+                IdOfFile = Helper.InputValidation.FileIdValidation(loggedUser, fileName);
+
+            Console.WriteLine("Upisite novo ime file-a:");
+            var newFileName = Console.ReadLine().Trim();
             while (true)
             {
-                if (string.IsNullOrEmpty(fileNameToDelete))
+                if (string.IsNullOrEmpty(newFileName))
                 {
-                    Console.WriteLine("Ime file-a ne moze biti prazno.");
+                    Console.WriteLine("Ime nemoze biti prazno");
                     var confirmForFolderName = Helper.InputValidation.ConfirmAndDelete();
                     if (confirmForFolderName)
                     {
-                        Console.Write("Unesite ime file-a:");
-                        fileNameToDelete = Console.ReadLine().Trim();
+                        Console.Write("Unesite ime:");
+                        fileName = Console.ReadLine().Trim();
                     }
                     else
                     {
-                        Console.WriteLine("Proces brisanja file-a je prekinut.");
+                        Console.WriteLine("Proces je prekinut.");
                         Console.ReadKey();
                         MyDiskMenuActions.MyDiskMenu(loggedUser);
                     }
                 }
-                else if (!Drive.Domain.Repositories.FileRepository.CheckIfFileExistByName(loggedUser, fileNameToDelete))
+                else if (newFileName==fileName)
                 {
-                    Console.WriteLine("Ne postoji file s time imenom.");
+                    Console.WriteLine("Nemozete promijeniti ime u isto.");
                     var confirmForFolderName = Helper.InputValidation.ConfirmAndDelete();
                     if (confirmForFolderName)
                     {
-                        Console.Write("Unesite ime file-a:");
-                        fileNameToDelete = Console.ReadLine().Trim();
+                        Console.Write("Unesite ime:");
+                        fileName = Console.ReadLine().Trim();
                     }
                     else
                     {
-                        Console.WriteLine("Proces brisanja file-a je prekinut.");
+                        Console.WriteLine("Proces je prekinut.");
                         Console.ReadKey();
                         MyDiskMenuActions.MyDiskMenu(loggedUser);
                     }
                 }
                 else
                     break;
-
-                if (Domain.Repositories.FileRepository.ReturnTheNumberOfFilesWithSamename(loggedUser, fileNameToDelete)>1)
-                {
-                    Console.WriteLine("Postoji vise file-ova s tim imenom.");
-                    Domain.Repositories.FileRepository.ListAllFilesWithSameName(loggedUser,fileNameToDelete);
-                    Console.Write("Unesite id file-a koji zelite izbrisati:");
-                    var isIdCorrect = int.TryParse(Console.ReadLine(), out var IdOfFileToDelete);
-                    while (true)
-                    {
-                        if (!Drive.Domain.Repositories.FileRepository.CheckIfFileExistById(loggedUser, IdOfFileToDelete))
-                        {
-                            Console.WriteLine("Ne postoji file s tim id-om.");
-                            var confirmForFolderName = Helper.InputValidation.ConfirmAndDelete();
-                            if (confirmForFolderName)
-                            {
-                                Console.Write("Unesite id file-a:");
-                                IdOfFileToDelete = int.Parse(Console.ReadLine());
-                            }
-                            else
-                            {
-                                Console.WriteLine("Proces brisanja file-a je prekinut.");
-                                Console.ReadKey();
-                                MyDiskMenuActions.MyDiskMenu(loggedUser);
-                            }
-                        }
-                        else if (!isIdCorrect)
-                        {
-                            Console.WriteLine("Uneseni id mora biti broj.");
-                            var confirmForFolderName = Helper.InputValidation.ConfirmAndDelete();
-                            if (confirmForFolderName)
-                            {
-                                Console.Write("Unesite id file-a:");
-                                isIdCorrect = int.TryParse(Console.ReadLine(), out IdOfFileToDelete);
-                            }
-                            else
-                            {
-                                Console.WriteLine("Proces brisanja file-a je prekinut.");
-                                Console.ReadKey();
-                                MyDiskMenuActions.MyDiskMenu(loggedUser);
-                            }
-                        }
-                        else if (IdOfFileToDelete <= 0)
-                        {
-                            Console.WriteLine("Id file-a mora biti veci od 0.");
-                            var confirmForFolderName = Helper.InputValidation.ConfirmAndDelete();
-                            if (confirmForFolderName)
-                            {
-                                Console.Write("Unesite id file-a:");
-                                isIdCorrect = int.TryParse(Console.ReadLine(), out IdOfFileToDelete);
-                            }
-                            else
-                            {
-                                Console.WriteLine("Proces brisanja file-a je prekinut.");
-                                Console.ReadKey();
-                                MyDiskMenuActions.MyDiskMenu(loggedUser);
-                            }
-                        }
-                        else
-                            break;
-
-                        if (Helper.InputValidation.ConfirmAndDelete())
-                        {
-                            if (Domain.Repositories.FileRepository.ReturnTheNumberOfFilesWithSamename(loggedUser, fileNameToDelete) > 1)
-                            {
-                                Domain.Repositories.FileRepository.DeleteFileById(loggedUser, IdOfFileToDelete);
-                                Console.WriteLine("File uspjesno izbrisan.");
-                                Console.ReadKey();
-                                MyDiskMenuActions.MyDiskMenu(loggedUser);
-                            }
-                            else
-                            {
-                                Domain.Repositories.FileRepository.DeleteFileByName(loggedUser, fileNameToDelete);
-                                Console.WriteLine("File uspjesno izbrisan.");
-                                Console.ReadKey();
-                                MyDiskMenuActions.MyDiskMenu(loggedUser);
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine("Proces brisanja foldera je prekinut.");
-                            Console.ReadKey();
-                            MyDiskMenuActions.MyDiskMenu(loggedUser);
-                        }
-                    }
-                }
             }
+
+            if (Helper.InputValidation.ConfirmAndDelete())
+            {
+                Domain.Repositories.FileRepository.ChangeFileName(loggedUser, fileName,newFileName, IdOfFile);
+                Console.WriteLine("File-u uspjesno promjenjeno ime.");
+                Console.ReadKey();
+                MyDiskMenuActions.MyDiskMenu(loggedUser);
+            }
+            else
+            {
+                Console.WriteLine("Proces je prekinut.");
+                Console.ReadKey();
+                MyDiskMenuActions.MyDiskMenu(loggedUser);
+            }
+
+
         }
     }
 }

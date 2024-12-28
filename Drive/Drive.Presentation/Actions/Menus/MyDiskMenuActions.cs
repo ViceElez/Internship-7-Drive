@@ -9,7 +9,6 @@ namespace Drive.Presentation.Actions.Menus
         {
             while (true)
             { //triba kad se folder dodaje da mu dan i parent folder al to implementiraj kad bude tribalo ulazit u mape, i nek se ispise u kojem folderu se nalazis
-                //sve di triba upisat ime filea nek se radi priko id-a
                 Console.Clear();
                 //Console.WriteLine($"Nalazite se u {} folderu\n");
                 FolderRepositroy.ListAllFolders(loggedUser);
@@ -40,31 +39,23 @@ namespace Drive.Presentation.Actions.Menus
                         break;
 
                     case "izbrisi mapu":
-                        Console.Write("Upisite ime mape koju zelite izbrisati: ");
-                        var deleteFolder = Console.ReadLine().Trim();
-                        // Implementacija brisanja mape
+                         Drive.Presentation.Actions.Folder.FolderActions.DeleteFolder(loggedUser);
                         break;
 
                     case "izbrisi datoteku":
-                        Console.Write("Upisite ime datoteke koju zelite izbrisati: ");
-                        var deleteFile = Console.ReadLine().Trim();
-                        // Implementacija brisanja datoteke
+                        Drive.Presentation.Actions.File.FileActions.DeleteFile(loggedUser);
                         break;
 
                     case "promijeni naziv mape":
-                        Console.Write("Upisite ime mape kojoj zelite promijeniti naziv: ");
-                        var renameFolder = Console.ReadLine().Trim();
-                        // Implementacija promjene naziva mape
+                        Drive.Presentation.Actions.Folder.FolderActions.ChangeFolderName(loggedUser);
                         break;
 
                     case "promijeni naziv datoteke":
-                        Console.Write("Upisite ime datoteke kojoj zelite promijeniti naziv: ");
-                        var renameFile = Console.ReadLine().Trim();
-                        // Implementacija promjene naziva datoteke
+                        Drive.Presentation.Actions.File.FileActions.ChangeFileName(loggedUser);
                         break;
 
                     case "help":
-                        Drive.Domain.Repositories.HelpRepositorycs.ListAllFunctions();
+                        Helper.InputValidation.ListAllFunctions();
                         break;
 
                     case "povratak":
@@ -72,7 +63,7 @@ namespace Drive.Presentation.Actions.Menus
                         return;
 
                     default:
-                        Console.WriteLine("Nepostojeća komanda. Želite li vidjeti popis svih komandi? (da/ne)");
+                        Console.WriteLine("Nepostojeca komanda. Zelite li vidjeti popis svih komandi? (da/ne)");
 
                         while (true)
                         {
@@ -80,7 +71,7 @@ namespace Drive.Presentation.Actions.Menus
 
                             if (showHelp == "da")
                             {
-                                Drive.Domain.Repositories.HelpRepositorycs.ListAllFunctions();
+                                Helper.InputValidation.ListAllFunctions();
                                 break;
                             }
                             else if (showHelp == "ne")

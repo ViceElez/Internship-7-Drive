@@ -60,23 +60,11 @@ namespace Drive.Domain.Repositories
                 context.SaveChanges();
             }
         }
-        public static void DeleteFolderByName(User loggedUser,string nameOfFolderToDelete)
+        public static void DeleteFolder(User loggedUser, int IdOfFolderToDelete, string nameOfFolderToDelete)
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
-                var folder=context.driveFolders.FirstOrDefault(f=>f.Name==nameOfFolderToDelete && f.FolderUserId==loggedUser.Id);
-                if(folder != null)
-                {
-                    context.driveFolders.Remove(folder);
-                    context.SaveChanges();
-                }
-            }
-        }
-        public static void DeleteFolderById(User loggedUser, int IdOfFolderToDelete)
-        {
-            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
-            {
-                var folder = context.driveFolders.FirstOrDefault(f => f.Id == IdOfFolderToDelete && f.FolderUserId == loggedUser.Id);
+                var folder = context.driveFolders.FirstOrDefault(f => f.Id == IdOfFolderToDelete && f.Name==nameOfFolderToDelete && f.FolderUserId == loggedUser.Id);
                 if (folder != null)
                 {
                     context.driveFolders.Remove(folder);
@@ -100,6 +88,18 @@ namespace Drive.Domain.Repositories
                 foreach (var folder in foldersWithSameName)
                 {
                     Console.WriteLine($"{folder.Id}-{folder.Name}");
+                }
+            }
+        }
+        public static void ChangeFolderName(User loggedUser, string oldFolderName, string newFolderName, int folderId)
+        {
+            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
+            {
+                var folder = context.driveFolders.FirstOrDefault(f => f.Name == oldFolderName && f.Id==folderId && f.FolderUserId == loggedUser.Id);
+                if (folder != null)
+                {
+                    folder.Name = newFolderName;
+                    context.SaveChanges();
                 }
             }
         }
