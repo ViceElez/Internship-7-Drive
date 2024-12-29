@@ -6,15 +6,15 @@ using Drive.Data.Entities;
 
 namespace Drive.Domain.Repositories
 {
-    public class FolderRepositroy:BaseRepository
+    public class FolderRepositroy : BaseRepository
     {
-        public FolderRepositroy(DriveDbContext dbContext) : base(dbContext) { } 
-        public static void ListAllFolders(User loggedUser )
+        public FolderRepositroy(DriveDbContext dbContext) : base(dbContext) { }
+        public static void ListAllFolders(User loggedUser, int? currentFolderId)
         {
             Console.WriteLine("Vasi folderi su:");
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
-                var folders = context.driveFolders.Where(f => f.FolderUserId == loggedUser.Id).ToList();
+                var folders = context.driveFolders.Where(f => f.FolderUserId == loggedUser.Id && f.ParentFolderId==currentFolderId).ToList();
                 folders.OrderBy(f => f.Name);
                 foreach (var folder in folders)
                 {
@@ -22,24 +22,11 @@ namespace Drive.Domain.Repositories
                 }
             }
         }
-        public static bool CheckIfFolderExistsById(int IdOfFolder, User loggedUser)
+        public static bool CheckIfFolderExistsById(int IdOfFolder, User loggedUser, int? currentFolderId)
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
-                var folder=context.driveFolders.FirstOrDefault(f => f.Id == IdOfFolder && f.FolderUserId == loggedUser.Id);
-                if (folder != null)
-                {
-                   return true;
-                }
-
-                return false;
-            }
-        }
-        public static bool CheckIfFolderExistsByName(string nameOfFolder, User loggedUser)
-        {
-            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
-            {
-                var folder = context.driveFolders.FirstOrDefault(f => f.Name == nameOfFolder && f.FolderUserId == loggedUser.Id);
+                var folder = context.driveFolders.FirstOrDefault(f => f.Id == IdOfFolder && f.ParentFolderId== currentFolderId && f.FolderUserId == loggedUser.Id);
                 if (folder != null)
                 {
                     return true;
@@ -48,14 +35,28 @@ namespace Drive.Domain.Repositories
                 return false;
             }
         }
-        public static void CreateFolder(string folderName, User loggedUser)
+        public static bool CheckIfFolderExistsByName(string nameOfFolder, User loggedUser, int? currentFolderId)
+        {
+            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
+            {
+                var folder = context.driveFolders.FirstOrDefault(f => f.Name == nameOfFolder && f.ParentFolderId == currentFolderId && f.FolderUserId == loggedUser.Id);
+                if (folder != null)
+                {
+                    return true;
+                }
+
+                return false;
+            }
+        }
+        public static void CreateFolder(string folderName, User loggedUser, int? currentFolderId)
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
                 var folder = new DriveFolder
                 {
                     Name = folderName,
-                    FolderUserId = loggedUser.Id
+                    FolderUserId = loggedUser.Id,
+                    ParentFolderId = currentFolderId
                 };
                 context.driveFolders.Add(folder);
                 context.SaveChanges();
@@ -65,7 +66,7 @@ namespace Drive.Domain.Repositories
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
-                var folder = context.driveFolders.FirstOrDefault(f => f.Id == IdOfFolderToDelete && f.Name==nameOfFolderToDelete && f.FolderUserId == loggedUser.Id);
+                var folder = context.driveFolders.FirstOrDefault(f => f.Id == IdOfFolderToDelete && f.Name == nameOfFolderToDelete && f.FolderUserId == loggedUser.Id);
                 if (folder != null)
                 {
                     context.driveFolders.Remove(folder);
@@ -96,7 +97,7 @@ namespace Drive.Domain.Repositories
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
-                var folder = context.driveFolders.FirstOrDefault(f => f.Name == oldFolderName && f.Id==folderId && f.FolderUserId == loggedUser.Id);
+                var folder = context.driveFolders.FirstOrDefault(f => f.Name == oldFolderName && f.Id == folderId && f.FolderUserId == loggedUser.Id);
                 if (folder != null)
                 {
                     folder.Name = newFolderName;

@@ -8,12 +8,12 @@ namespace Drive.Domain.Repositories
     public class FileRepository: BaseRepository
     {
         public FileRepository(DriveDbContext dbContext) : base(dbContext) { }
-        public static void ListAllFiles(User loggedUser)
+        public static void ListAllFiles(User loggedUser, int? folderId)
         {
             Console.WriteLine("Vasi file-ovi su:");
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
-                var files = context.driveFiles.Where(f => f.FileUserId == loggedUser.Id).ToList();
+                var files = context.driveFiles.Where(f => f.FileUserId == loggedUser.Id && f.FolderId==folderId).ToList();
                files.OrderBy(f => f.LastChanges);
                 foreach (var file in files)
                 {
@@ -21,11 +21,11 @@ namespace Drive.Domain.Repositories
                 }
             }
         }
-        public static bool CheckIfFileExistById(User loggedUser, int IdOfFile)
+        public static bool CheckIfFileExistById(User loggedUser, int IdOfFile,int? currentFolderId)
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
-                var file = context.driveFiles.FirstOrDefault(f => f.Id ==IdOfFile  && f.FileUserId == loggedUser.Id);
+                var file = context.driveFiles.FirstOrDefault(f => f.Id ==IdOfFile && f.FolderId==currentFolderId  && f.FileUserId == loggedUser.Id);
                 if (file != null)
                 {
                     return true;
@@ -34,11 +34,11 @@ namespace Drive.Domain.Repositories
                 return false;
             }
         }
-        public static bool CheckIfFileExistByName(User loggedUser, string NameOfFile)
+        public static bool CheckIfFileExistByName(User loggedUser, string NameOfFile, int? currentFileId)
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
-                var file = context.driveFiles.FirstOrDefault(f => f.Name == NameOfFile && f.FileUserId == loggedUser.Id);
+                var file = context.driveFiles.FirstOrDefault(f => f.Name == NameOfFile && f.FolderId==currentFileId && f.FileUserId == loggedUser.Id);
                 if (file != null)
                 {
                     return true;
@@ -47,7 +47,7 @@ namespace Drive.Domain.Repositories
                 return false;
             }
         }
-        public static void AddFile(User loggedUser, string fileName)
+        public static void AddFile(User loggedUser, string fileName, int? currentFolderId)
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
@@ -55,6 +55,7 @@ namespace Drive.Domain.Repositories
                 {
                     Name = fileName,
                     FileUserId = loggedUser.Id,
+                    FolderId=currentFolderId
                 };
                 context.driveFiles.Add(file);
                 context.SaveChanges();

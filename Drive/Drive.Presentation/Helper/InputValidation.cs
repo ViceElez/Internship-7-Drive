@@ -35,7 +35,7 @@ namespace Drive.Presentation.Helper
 
             return Regex.IsMatch(email, regex, RegexOptions.IgnoreCase);
         }
-        public static string FileNameValidation(User loggedUser)
+        public static string FileNameValidation(User loggedUser, int? currentFolderId)
         {
             var fileName = Console.ReadLine().Trim();
             while (true)
@@ -43,12 +43,12 @@ namespace Drive.Presentation.Helper
                 if (string.IsNullOrEmpty(fileName))
                 {
                     Console.WriteLine("Ime nemoze biti prazno");
-                    fileName = ReturnNameOrMenuForNameValidation(loggedUser, fileName);
+                    fileName = ReturnNameOrMenuForNameValidation(loggedUser, fileName, currentFolderId);
                 }
-                else if (!Drive.Domain.Repositories.FileRepository.CheckIfFileExistByName(loggedUser, fileName))
+                else if (!Drive.Domain.Repositories.FileRepository.CheckIfFileExistByName(loggedUser, fileName,currentFolderId))
                 {
                     Console.WriteLine("Ne postoji file s time imenom.");
-                    fileName = ReturnNameOrMenuForNameValidation(loggedUser, fileName);
+                    fileName = ReturnNameOrMenuForNameValidation(loggedUser, fileName, currentFolderId);
                 }
                 else
                     break;
@@ -56,7 +56,7 @@ namespace Drive.Presentation.Helper
 
             return fileName;
         }
-        public static int FileIdValidation(User loggedUser, string fileName)
+        public static int FileIdValidation(User loggedUser, string fileName, int? currentFolderId)
         {
             var fileId = 0;
             Console.WriteLine("Postoji vise file-ova s tim imenom.");
@@ -79,7 +79,7 @@ namespace Drive.Presentation.Helper
                     {
                         Console.WriteLine("Proces je prekinut.");
                         Console.ReadKey();
-                        MyDiskMenuActions.MyDiskMenu(loggedUser);
+                        MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
                     }
                 }
                 else if (fileId <= 0)
@@ -95,10 +95,10 @@ namespace Drive.Presentation.Helper
                     {
                         Console.WriteLine("Proces je prekinut.");
                         Console.ReadKey();
-                        MyDiskMenuActions.MyDiskMenu(loggedUser);
+                        MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
                     }
                 }
-                else if (!Drive.Domain.Repositories.FileRepository.CheckIfFileExistById(loggedUser, fileId))
+                else if (!Drive.Domain.Repositories.FileRepository.CheckIfFileExistById(loggedUser, fileId,currentFolderId))
                 {
                     Console.WriteLine("Ne postoji file s tim id-om.");
                     var confirmForFolderName = Helper.InputValidation.ConfirmAndDelete();
@@ -111,7 +111,7 @@ namespace Drive.Presentation.Helper
                     {
                         Console.WriteLine("Proces je prekinut.");
                         Console.ReadKey();
-                        MyDiskMenuActions.MyDiskMenu(loggedUser);
+                        MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
                     }
                 }
                 else
@@ -120,7 +120,7 @@ namespace Drive.Presentation.Helper
 
             return fileId;
         }
-        public static string FolderNameValidation(User loggedUser)
+        public static string FolderNameValidation(User loggedUser,int? currentFolderId)
         {
             var folderName = Console.ReadLine().Trim();
             while (true)
@@ -128,34 +128,12 @@ namespace Drive.Presentation.Helper
                 if (string.IsNullOrEmpty(folderName))
                 {
                     Console.WriteLine("Ime mape ne moze biti prazno.");
-                    var confirmForFolderName = Helper.InputValidation.ConfirmAndDelete();
-                    if (confirmForFolderName)
-                    {
-                        Console.Write("Unesite ime mape:");
-                        folderName = Console.ReadLine().Trim();
-                    }
-                    else
-                    {
-                        Console.WriteLine("Proces je prekinut.");
-                        Console.ReadKey();
-                        MyDiskMenuActions.MyDiskMenu(loggedUser);
-                    }
+                    folderName= ReturnNameOrMenuForNameValidation(loggedUser, folderName, currentFolderId);
                 }
-                else if (!Domain.Repositories.FolderRepositroy.CheckIfFolderExistsByName(folderName, loggedUser))
+                else if (!Domain.Repositories.FolderRepositroy.CheckIfFolderExistsByName(folderName, loggedUser, currentFolderId))
                 {
                     Console.WriteLine("Nepostoji mapa s tim imenom.");
-                    var confirmForFolderName = Helper.InputValidation.ConfirmAndDelete();
-                    if (confirmForFolderName)
-                    {
-                        Console.Write("Unesite ime mape:");
-                        folderName = Console.ReadLine().Trim();
-                    }
-                    else
-                    {
-                        Console.WriteLine("Proces je prekinut.");
-                        Console.ReadKey();
-                        MyDiskMenuActions.MyDiskMenu(loggedUser);
-                    }
+                    folderName = ReturnNameOrMenuForNameValidation(loggedUser, folderName, currentFolderId);
                 }
                 else
                 {
@@ -164,7 +142,7 @@ namespace Drive.Presentation.Helper
             }
             return folderName;
         }
-        public static int FolderIdValidation(User loggedUser, string folderName)
+        public static int FolderIdValidation(User loggedUser, string folderName, int? currentFolderId)
         {
             Console.WriteLine("Postoji vise foldera s istim imenom");
             Domain.Repositories.FolderRepositroy.ListAllFoldersWithSameName(loggedUser, folderName);
@@ -174,23 +152,7 @@ namespace Drive.Presentation.Helper
 
             while (true)
             {
-                if (!Domain.Repositories.FolderRepositroy.CheckIfFolderExistsById(folderId, loggedUser))
-                {
-                    Console.WriteLine("Ne postoji folder s tim id-om.");
-                    var confirmForFolderName = Helper.InputValidation.ConfirmAndDelete();
-                    if (confirmForFolderName)
-                    {
-                        Console.Write("Upisite id foldera:");
-                        isIdCorrect = int.TryParse(Console.ReadLine(), out folderId);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Proces je prekinut.");
-                        Console.ReadKey();
-                        MyDiskMenuActions.MyDiskMenu(loggedUser);
-                    }
-                }
-                else if (!isIdCorrect)
+                 if (!isIdCorrect)
                 {
                     Console.WriteLine("Upisani id mora biti broj.");
                     var confirmForFolderName = Helper.InputValidation.ConfirmAndDelete();
@@ -203,7 +165,7 @@ namespace Drive.Presentation.Helper
                     {
                         Console.WriteLine("Proces je prekinut.");
                         Console.ReadKey();
-                        MyDiskMenuActions.MyDiskMenu(loggedUser);
+                        MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
                     }
                 }
                 else if (folderId <= 0)
@@ -219,7 +181,23 @@ namespace Drive.Presentation.Helper
                     {
                         Console.WriteLine("Proces je prekinut.");
                         Console.ReadKey();
-                        MyDiskMenuActions.MyDiskMenu(loggedUser);
+                        MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
+                    }
+                }
+                else if (!Domain.Repositories.FolderRepositroy.CheckIfFolderExistsById(folderId, loggedUser, currentFolderId))
+                {
+                    Console.WriteLine("Ne postoji folder s tim id-om.");
+                    var confirmForFolderName = Helper.InputValidation.ConfirmAndDelete();
+                    if (confirmForFolderName)
+                    {
+                        Console.Write("Upisite id foldera:");
+                        isIdCorrect = int.TryParse(Console.ReadLine(), out folderId);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Proces je prekinut.");
+                        Console.ReadKey();
+                        MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
                     }
                 }
                 else
@@ -228,12 +206,12 @@ namespace Drive.Presentation.Helper
 
             return folderId;
         }
-        public static string ReturnNameOrMenuForNameValidation(User loggedUser,string fileName)
+        public static string ReturnNameOrMenuForNameValidation(User loggedUser,string fileName,int? currentFolderId)
         {
             var confirmForFolderName = Helper.InputValidation.ConfirmAndDelete();
             if (confirmForFolderName)
             {
-                Console.Write("Unesite ime file-a:");
+                Console.Write("Unesite ime:");
                 fileName = Console.ReadLine().Trim();
                 return fileName;
             }
@@ -241,7 +219,7 @@ namespace Drive.Presentation.Helper
             {
                 Console.WriteLine("Proces je prekinut.");
                 Console.ReadKey();
-                MyDiskMenuActions.MyDiskMenu(loggedUser);
+                MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
                 return null;
             }
         }

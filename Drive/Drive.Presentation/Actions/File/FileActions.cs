@@ -5,7 +5,7 @@ namespace Drive.Presentation.Actions.File
 {
     public class FileActions 
     {
-        public static void CreateFile(User loggedUser)
+        public static void CreateFile(User loggedUser, int? currentFolderId)
         {
             Console.Write("Upisite ime file-a:");
             var fileName=Console.ReadLine().Trim();
@@ -24,7 +24,7 @@ namespace Drive.Presentation.Actions.File
                     {
                         Console.WriteLine("Proces kreiranja file-a je prekinut.");
                         Console.ReadKey();
-                        MyDiskMenuActions.MyDiskMenu(loggedUser);
+                        MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
                     }
                 }
                 else
@@ -33,25 +33,25 @@ namespace Drive.Presentation.Actions.File
             }
             if (Helper.InputValidation.ConfirmAndDelete())
             {
-                Drive.Domain.Repositories.FileRepository.AddFile(loggedUser, fileName);
+                Drive.Domain.Repositories.FileRepository.AddFile(loggedUser, fileName, currentFolderId);
                 Console.WriteLine("File uspjesno kreirana.");
                 Console.ReadKey();
-                MyDiskMenuActions.MyDiskMenu(loggedUser);
+                MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
             }
             else
             {
                 Console.WriteLine("Proces kreiranja file-a je prekinut.");
                 Console.ReadKey();
-                MyDiskMenuActions.MyDiskMenu(loggedUser);
+                MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
             }
         }
-        public static void DeleteFile(User loggedUser)
+        public static void DeleteFile(User loggedUser,int? currentFolderId)
         {
             Console.WriteLine("Upisite ime file-a kojeg zelite izbrisati:");
-            var fileNameToDelete = Helper.InputValidation.FileNameValidation(loggedUser);
+            var fileNameToDelete = Helper.InputValidation.FileNameValidation(loggedUser, currentFolderId);
             var fileIdToDelete = 0;
             if (Domain.Repositories.FileRepository.ReturnTheNumberOfFilesWithSamename(loggedUser, fileNameToDelete) > 1)
-                fileIdToDelete = Helper.InputValidation.FileIdValidation(loggedUser, fileNameToDelete);
+                fileIdToDelete = Helper.InputValidation.FileIdValidation(loggedUser, fileNameToDelete, currentFolderId);
 
             if (Helper.InputValidation.ConfirmAndDelete())
             {
@@ -60,25 +60,25 @@ namespace Drive.Presentation.Actions.File
                 Domain.Repositories.FileRepository.DeleteFile(loggedUser, fileIdToDelete,fileNameToDelete);
                 Console.WriteLine("File uspjesno izbrisan.");
                 Console.ReadKey();
-                MyDiskMenuActions.MyDiskMenu(loggedUser);
+                MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
             }
             else
             {
                 Console.WriteLine("Proces je prekinut.");
                 Console.ReadKey();
-                MyDiskMenuActions.MyDiskMenu(loggedUser);
+                MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
             }
         }
-        public static void ChangeFileName(User loggedUser)
+        public static void ChangeFileName(User loggedUser, int? currentFolderId)
         {
             Console.Write("Upisite ime file-a kojem zelite promijeniti ime:");
-            var fileName=Helper.InputValidation.FileNameValidation( loggedUser);
+            var fileName=Helper.InputValidation.FileNameValidation( loggedUser, currentFolderId);
 
             var IdOfFile = 0;
             if (Domain.Repositories.FileRepository.ReturnTheNumberOfFilesWithSamename(loggedUser, fileName) > 1)
-                IdOfFile = Helper.InputValidation.FileIdValidation(loggedUser, fileName);
+                IdOfFile = Helper.InputValidation.FileIdValidation(loggedUser, fileName, currentFolderId);
 
-            Console.WriteLine("Upisite novo ime file-a:");
+            Console.Write("Upisite novo ime file-a:");
             var newFileName = Console.ReadLine().Trim();
             while (true)
             {
@@ -89,13 +89,13 @@ namespace Drive.Presentation.Actions.File
                     if (confirmForFileName)
                     {
                         Console.Write("Unesite ime:");
-                        fileName = Console.ReadLine().Trim();
+                        newFileName = Console.ReadLine().Trim();
                     }
                     else
                     {
                         Console.WriteLine("Proces je prekinut.");
                         Console.ReadKey();
-                        MyDiskMenuActions.MyDiskMenu(loggedUser);
+                        MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
                     }
                 }
                 else if (newFileName==fileName)
@@ -111,7 +111,7 @@ namespace Drive.Presentation.Actions.File
                     {
                         Console.WriteLine("Proces je prekinut.");
                         Console.ReadKey();
-                        MyDiskMenuActions.MyDiskMenu(loggedUser);
+                        MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
                     }
                 }
                 else
@@ -125,15 +125,19 @@ namespace Drive.Presentation.Actions.File
                 Domain.Repositories.FileRepository.ChangeFileName(loggedUser, fileName,newFileName, IdOfFile);
                 Console.WriteLine("File-u uspjesno promjenjeno ime.");
                 Console.ReadKey();
-                return;
+                MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
             }
             else
             {
                 Console.WriteLine("Proces je prekinut.");
                 Console.ReadKey();
-                MyDiskMenuActions.MyDiskMenu(loggedUser);
+                MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
             }
 
+
+        }
+        public static void EditFileContent(User loggedUser, int? currentFolderId)
+        {
 
         }
     }
