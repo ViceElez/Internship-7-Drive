@@ -1,9 +1,10 @@
 ﻿using Drive.Data.Entities.Models.Users;
 using Drive.Presentation.Actions.Menus;
+using System.Diagnostics.Eventing.Reader;
 
 namespace Drive.Presentation.Actions.Folder
 {
-    public class FolderActions //malo pogledaj ovi file i folder ka jesan li sta krivo napisa ka za file folder ili obrnuto
+    public class FolderActions //akd upises za novo ime prazno onda vise nemos upisat jer ti uvik vrati isto
     {
         public static void CreateFolder(User loggedUser)
         {
@@ -58,6 +59,8 @@ namespace Drive.Presentation.Actions.Folder
 
             if (Helper.InputValidation.ConfirmAndDelete())
             {
+                if(Domain.Repositories.FolderRepositroy.ReturnTheNumberOfFoldersWithSamename(loggedUser,folderName)==1)
+                    folderId=Domain.Repositories.FolderRepositroy.GetFolderId(loggedUser,folderName);
                 Domain.Repositories.FolderRepositroy.DeleteFolder(loggedUser, folderId,folderName);
                 Console.WriteLine("Folder uspjesno izbrisan.");
                 Console.ReadKey();
@@ -79,7 +82,7 @@ namespace Drive.Presentation.Actions.Folder
             if (Domain.Repositories.FolderRepositroy.ReturnTheNumberOfFoldersWithSamename(loggedUser, folderName) > 1)
                 folderId = Helper.InputValidation.FolderIdValidation(loggedUser, folderName);
 
-            Console.WriteLine("Upisite novo ime za folder:");
+            Console.Write("Upisite novo ime za folder:");
             var newFolderName = Console.ReadLine().Trim();
             while (true)
             {
@@ -90,7 +93,23 @@ namespace Drive.Presentation.Actions.Folder
                     if (confirmForFolderName)
                     {
                         Console.Write("Unesite ime mape:");
-                        folderName = Console.ReadLine().Trim();
+                        newFolderName = Console.ReadLine().Trim();
+                    }
+                    else
+                    {
+                        Console.WriteLine("Proces je prekinut.");
+                        Console.ReadKey();
+                        MyDiskMenuActions.MyDiskMenu(loggedUser);
+                    }
+                }
+                else if (newFolderName==folderName)
+                {
+                    Console.WriteLine("Nemozete promijeniti ime foldera u isto.");
+                    var confirmForFolderName = Helper.InputValidation.ConfirmAndDelete();
+                    if (confirmForFolderName)
+                    {
+                        Console.Write("Unesite ime:");  
+                        newFolderName = Console.ReadLine().Trim();
                     }
                     else
                     {
@@ -105,10 +124,12 @@ namespace Drive.Presentation.Actions.Folder
 
             if (Helper.InputValidation.ConfirmAndDelete())
             {
-                    Domain.Repositories.FolderRepositroy.ChangeFolderName(loggedUser,folderName,newFolderName, folderId);
-                    Console.WriteLine("Folderu uspjesno promjenjeno ime.");
-                    Console.ReadKey();
-                    MyDiskMenuActions.MyDiskMenu(loggedUser);
+                if (Domain.Repositories.FolderRepositroy.ReturnTheNumberOfFoldersWithSamename(loggedUser, folderName) == 1)
+                    folderId = Domain.Repositories.FolderRepositroy.GetFolderId(loggedUser, folderName);
+                Domain.Repositories.FolderRepositroy.ChangeFolderName(loggedUser,folderName,newFolderName, folderId);
+                Console.WriteLine("Folderu uspjesno promjenjeno ime.");
+                Console.ReadKey();
+                MyDiskMenuActions.MyDiskMenu(loggedUser);
             }
             else
             {

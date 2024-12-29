@@ -11,6 +11,7 @@ namespace Drive.Domain.Repositories
         public FolderRepositroy(DriveDbContext dbContext) : base(dbContext) { } 
         public static void ListAllFolders(User loggedUser )
         {
+            Console.WriteLine("Vasi folderi su:");
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
                 var folders = context.driveFolders.Where(f => f.FolderUserId == loggedUser.Id).ToList();
@@ -101,6 +102,14 @@ namespace Drive.Domain.Repositories
                     folder.Name = newFolderName;
                     context.SaveChanges();
                 }
+            }
+        }
+        public static int GetFolderId(User loggedUser, string folderName)
+        {
+            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
+            {
+                var folder = context.driveFolders.FirstOrDefault(f => f.Name == folderName && f.FolderUserId == loggedUser.Id);
+                return folder.Id;
             }
         }
     }

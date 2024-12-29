@@ -3,7 +3,7 @@ using Drive.Presentation.Actions.Menus;
 
 namespace Drive.Presentation.Actions.File
 {
-    public class FileActions // za ove file i foldere brisat triba stavit jednu funkciju samo al da gleda i ime i id filea ili foldera i user id
+    public class FileActions 
     {
         public static void CreateFile(User loggedUser)
         {
@@ -55,6 +55,8 @@ namespace Drive.Presentation.Actions.File
 
             if (Helper.InputValidation.ConfirmAndDelete())
             {
+                if(Domain.Repositories.FileRepository.ReturnTheNumberOfFilesWithSamename(loggedUser, fileNameToDelete) == 1)
+                    fileIdToDelete=Domain.Repositories.FileRepository.GetFileId(loggedUser, fileNameToDelete);
                 Domain.Repositories.FileRepository.DeleteFile(loggedUser, fileIdToDelete,fileNameToDelete);
                 Console.WriteLine("File uspjesno izbrisan.");
                 Console.ReadKey();
@@ -83,8 +85,8 @@ namespace Drive.Presentation.Actions.File
                 if (string.IsNullOrEmpty(newFileName))
                 {
                     Console.WriteLine("Ime nemoze biti prazno");
-                    var confirmForFolderName = Helper.InputValidation.ConfirmAndDelete();
-                    if (confirmForFolderName)
+                    var confirmForFileName = Helper.InputValidation.ConfirmAndDelete();
+                    if (confirmForFileName)
                     {
                         Console.Write("Unesite ime:");
                         fileName = Console.ReadLine().Trim();
@@ -99,11 +101,11 @@ namespace Drive.Presentation.Actions.File
                 else if (newFileName==fileName)
                 {
                     Console.WriteLine("Nemozete promijeniti ime u isto.");
-                    var confirmForFolderName = Helper.InputValidation.ConfirmAndDelete();
-                    if (confirmForFolderName)
+                    var confirmForFileName = Helper.InputValidation.ConfirmAndDelete();
+                    if (confirmForFileName)
                     {
                         Console.Write("Unesite ime:");
-                        fileName = Console.ReadLine().Trim();
+                        newFileName = Console.ReadLine().Trim();
                     }
                     else
                     {
@@ -118,10 +120,12 @@ namespace Drive.Presentation.Actions.File
 
             if (Helper.InputValidation.ConfirmAndDelete())
             {
+                if (Domain.Repositories.FileRepository.ReturnTheNumberOfFilesWithSamename(loggedUser, fileName) == 1)
+                    IdOfFile = Domain.Repositories.FileRepository.GetFileId(loggedUser, fileName);
                 Domain.Repositories.FileRepository.ChangeFileName(loggedUser, fileName,newFileName, IdOfFile);
                 Console.WriteLine("File-u uspjesno promjenjeno ime.");
                 Console.ReadKey();
-                MyDiskMenuActions.MyDiskMenu(loggedUser);
+                return;
             }
             else
             {

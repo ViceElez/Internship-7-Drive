@@ -20,7 +20,7 @@ namespace Drive.Presentation.Actions.Menus
                     Console.WriteLine("Dijeljeno sa mnom");
                     break;
                 case 2:
-                    Console.WriteLine("Postavke profila");
+                    AccountSettings.AccountSettingActions.AccountSettingsMenu(loggedUser);
                     break;
                 case 3:
                     MainMenuActions.MainMenu();

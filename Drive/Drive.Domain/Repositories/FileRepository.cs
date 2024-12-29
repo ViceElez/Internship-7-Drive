@@ -10,6 +10,7 @@ namespace Drive.Domain.Repositories
         public FileRepository(DriveDbContext dbContext) : base(dbContext) { }
         public static void ListAllFiles(User loggedUser)
         {
+            Console.WriteLine("Vasi file-ovi su:");
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
                 var files = context.driveFiles.Where(f => f.FileUserId == loggedUser.Id).ToList();
@@ -100,6 +101,14 @@ namespace Drive.Domain.Repositories
                     file.Name = newFileName;
                     context.SaveChanges();
                 }
+            }
+        }
+        public static int GetFileId(User loggedUser,string fileName)
+        {
+            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
+            {
+                var file = context.driveFiles.FirstOrDefault(f => f.Name == fileName && f.FileUserId == loggedUser.Id);
+                return file.Id;
             }
         }
     }

@@ -60,7 +60,6 @@ namespace Drive.Domain.Repositories
             return captcha;
         }
 
-
         public static bool CheckCaptcha(string generatedCaptcha, string enteredCaptcha)
         {
             if (generatedCaptcha == enteredCaptcha)
@@ -69,6 +68,26 @@ namespace Drive.Domain.Repositories
             }
             else
                 return false;
+        }
+
+        public static void ChangeAccountEmail(string newEmail, User loggedUser)
+        {
+            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
+            {
+                var user = context.Users.FirstOrDefault(u => u.Email == loggedUser.Email);
+                user.Email = newEmail;
+                context.SaveChanges();
+            }
+        }
+
+        public static void ChangeAccountPassword(string newPassword, User loggedUser)
+        {
+            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
+            {
+                var user = context.Users.FirstOrDefault(u => u.Email == loggedUser.Email);
+                user.Password = newPassword;
+                context.SaveChanges();
+            }
         }
 
     }
