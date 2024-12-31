@@ -229,5 +229,9 @@ namespace Drive.Presentation.Helper
                 "\n5. Izbrisi mapu\n6. Izbrisi datoteku\n7. Promijeni naziv mape\n8. Promijeni naziv datoteke\n9. Povratak");
             Console.ReadKey();
         }
+        public static void ListAllEditFileFunctions()
+        {
+            Console.WriteLine("1.:Spremanje i izlaz\n2.:Izlaz bez spremanja");
+        }
     }
 }

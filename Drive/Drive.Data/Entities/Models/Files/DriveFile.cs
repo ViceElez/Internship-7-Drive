@@ -21,6 +21,7 @@ namespace Drive.Data.Entities.Models.Files
             Text = text;
             FileUserId = FileUserID;
             FolderId = FolderID;
+            LastChanges = DateTime.Now;
         }
 
         public DriveFile()

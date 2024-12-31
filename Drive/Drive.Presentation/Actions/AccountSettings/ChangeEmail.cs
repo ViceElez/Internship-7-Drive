@@ -6,6 +6,8 @@ namespace Drive.Presentation.Actions.AccountSettings
     {
         public static void ChangeAccountEmail(User loggedUser)
         {
+            Console.Clear();
+            Console.WriteLine($"Trenutni email:{loggedUser.Email}");
             Console.Write("Unesite novi email: ");
             var newEmail = Console.ReadLine();
             while (true)
@@ -65,7 +67,7 @@ namespace Drive.Presentation.Actions.AccountSettings
 
             if (Helper.InputValidation.ConfirmAndDelete())
             {
-                Drive.Domain.Repositories.UserRepository.ChangeAccountEmail(newEmail, loggedUser);
+                loggedUser=Drive.Domain.Repositories.UserRepository.ChangeAccountEmail(newEmail, loggedUser);
                 Console.WriteLine("Email uspjesno promijenjen!");
                 Console.ReadKey();
                 AccountSettingActions.AccountSettingsMenu(loggedUser);

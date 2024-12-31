@@ -1,5 +1,9 @@
 ﻿using Drive.Data.Entities.Models.Users;
 using Drive.Presentation.Actions.Menus;
+using Drive.Presentation.Helper;
+using Microsoft.EntityFrameworkCore.ValueGeneration;
+using System.ComponentModel.DataAnnotations;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Drive.Presentation.Actions.File
 {
@@ -138,7 +142,75 @@ namespace Drive.Presentation.Actions.File
         }
         public static void EditFileContent(User loggedUser, int? currentFolderId)
         {
+            Console.WriteLine("Upisite ime file-a koji zelite urediti:");
+            var fileName = Helper.InputValidation.FileNameValidation(loggedUser, currentFolderId);
 
+            var fileId = 0;
+            if (Domain.Repositories.FileRepository.ReturnTheNumberOfFilesWithSamename(loggedUser, fileName) > 1)
+                fileId = Helper.InputValidation.FileIdValidation(loggedUser, fileName, currentFolderId);
+
+            if (Domain.Repositories.FileRepository.ReturnTheNumberOfFilesWithSamename(loggedUser, fileName) == 1)
+                fileId = Domain.Repositories.FileRepository.GetFileId(loggedUser, fileName);
+
+            Console.Clear();
+            var fileToEdit = Domain.Repositories.FileRepository.GetFile(loggedUser, fileName, fileId);
+            Console.WriteLine($"Uredivanje datoteke: {fileToEdit.Name}");
+            Console.WriteLine($"\nTrenutni tekst: {fileToEdit.Text}");
+
+            List<string> lines = new List<string>(fileToEdit.Text.Split('\n'));
+            string currentLine = string.Empty;
+
+            Console.WriteLine("Unesite tekst za spremanje. Koristite ':help' za popis komandi.");
+
+            while (true)
+            {
+                var keyInfo = Console.ReadKey(intercept: true);
+                char keyChar = keyInfo.KeyChar;
+
+                if (keyChar == ':')
+                {
+                    Console.WriteLine();
+                    string command = Console.ReadLine();
+
+                    switch (command.ToLower().Trim())
+                    {
+                        case "help":
+                            InputValidation.ListAllEditFileFunctions();
+                            break;
+
+                        case "spremanje i izlaz":
+                            Domain.Repositories.FileRepository.SavingAEditedFile(loggedUser, fileName, fileId, lines);
+                            Console.WriteLine("Datoteka je spremljena.");
+                            Console.ReadKey();
+                            return;
+
+                        case "izlaz bez spremanja":
+                            Console.WriteLine("Izlaz bez spremanja.");
+                            Console.ReadKey();
+                            return;
+
+                        default:
+                            Console.WriteLine($"Nepoznata komanda: {command}");
+                            Console.ReadKey();
+                            break;
+                    }
+                }
+                else if (keyInfo.Key == ConsoleKey.Backspace)
+                {
+                    lines = Domain.Repositories.FileRepository.HandlingBackspaceFileEditings(loggedUser, fileName, fileId, lines, ref currentLine);
+                }
+                else if (keyInfo.Key == ConsoleKey.Enter)
+                {
+                    lines = Domain.Repositories.FileRepository.HandlingEnterFileEditings(loggedUser, fileName, fileId, lines, ref currentLine);
+                }
+                else
+                {
+                    currentLine += keyChar;
+                    Console.Write(keyChar);
+                }
+            }
         }
+
+
     }
 }

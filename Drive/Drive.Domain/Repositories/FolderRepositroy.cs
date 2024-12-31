@@ -14,8 +14,8 @@ namespace Drive.Domain.Repositories
             Console.WriteLine("Vasi folderi su:");
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
-                var folders = context.driveFolders.Where(f => f.FolderUserId == loggedUser.Id && f.ParentFolderId==currentFolderId).ToList();
-                folders.OrderBy(f => f.Name);
+                var folders = context.driveFolders .Where(f => f.FolderUserId == loggedUser.Id && f.ParentFolderId == currentFolderId)
+                    .OrderBy(f => f.Name).ToList();
                 foreach (var folder in folders)
                 {
                     Console.WriteLine($"{folder.Id}-{folder.Name}");
@@ -56,7 +56,8 @@ namespace Drive.Domain.Repositories
                 {
                     Name = folderName,
                     FolderUserId = loggedUser.Id,
-                    ParentFolderId = currentFolderId
+                    ParentFolderId = currentFolderId,
+                    CreatedAt = DateTime.UtcNow
                 };
                 context.driveFolders.Add(folder);
                 context.SaveChanges();
@@ -111,6 +112,14 @@ namespace Drive.Domain.Repositories
             {
                 var folder = context.driveFolders.FirstOrDefault(f => f.Name == folderName && f.FolderUserId == loggedUser.Id);
                 return folder.Id;
+            }
+        }
+        public static DriveFolder GetFolderById(int? folderId)
+        {
+            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
+            {
+                var folder = context.driveFolders.FirstOrDefault(f => f.Id == folderId);
+                return folder;
             }
         }
     }

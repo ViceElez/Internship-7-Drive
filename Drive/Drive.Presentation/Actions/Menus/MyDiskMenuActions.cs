@@ -8,10 +8,15 @@ namespace Drive.Presentation.Actions.Menus
         public static void MyDiskMenu(User loggedUser, int? currentFolderId)
         {
             while (true)
-            { //triba kad se folder dodaje da mu dan i parent folder al to implementiraj kad bude tribalo ulazit u mape, i nek se ispise u kojem folderu se nalazis
+            { 
                 Console.Clear();
-                //Console.WriteLine($"Nalazite se u {} folderu\n");
+                var currentFolder = FolderRepositroy.GetFolderById(currentFolderId);
+                if (currentFolder == null)
+                    Console.WriteLine("Nalazite se u pocetnom folderu.\n");
+                else
+                    Console.WriteLine($"Nalazite se u {currentFolder.Name} folderu.\n");
                 FolderRepositroy.ListAllFolders(loggedUser, currentFolderId);
+                Console.WriteLine();
                 FileRepository.ListAllFiles(loggedUser, currentFolderId);
                 Console.WriteLine("Upisite komandu za rad s datotekama (ili upisite 'help' za popis komandi):");
                 var commandOption = Console.ReadLine().Trim().ToLower();

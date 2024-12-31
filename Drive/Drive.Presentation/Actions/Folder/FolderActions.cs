@@ -5,7 +5,7 @@ using System.Diagnostics.Eventing.Reader;
 
 namespace Drive.Presentation.Actions.Folder
 {
-    public class FolderActions //neradi ulazak u mapu, moras jos seedat jer su se samo neki folderi seedali
+    public class FolderActions // moras jos seedat jer su se samo neki folderi seedali, i triba dodat da imaju oni opciju za shareat to vidi kako i  commentar koji samo moze bit ako je ovi folder javan valjda svima
     {
         public static void CreateFolder(User loggedUser,int? currentFolderId)
         {

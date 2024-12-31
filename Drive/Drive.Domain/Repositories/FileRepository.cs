@@ -2,6 +2,7 @@
 using Drive.Data.Entities.Models.Users;
 using Microsoft.EntityFrameworkCore;
 using Drive.Data.Entities.Models.Files;
+using System.Security;
 
 namespace Drive.Domain.Repositories
 {
@@ -13,8 +14,8 @@ namespace Drive.Domain.Repositories
             Console.WriteLine("Vasi file-ovi su:");
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
-                var files = context.driveFiles.Where(f => f.FileUserId == loggedUser.Id && f.FolderId==folderId).ToList();
-               files.OrderBy(f => f.LastChanges);
+                var files = context.driveFiles.Where(f => f.FileUserId == loggedUser.Id && f.FolderId==folderId)
+                 .OrderByDescending(f => f.LastChanges).ToList();
                 foreach (var file in files)
                 {
                     Console.WriteLine($"{file.Id}-{file.Name}");
@@ -55,7 +56,9 @@ namespace Drive.Domain.Repositories
                 {
                     Name = fileName,
                     FileUserId = loggedUser.Id,
-                    FolderId=currentFolderId
+                    FolderId=currentFolderId,
+                    LastChanges = DateTime.UtcNow,
+                    Text="Default text"
                 };
                 context.driveFiles.Add(file);
                 context.SaveChanges();
@@ -112,5 +115,58 @@ namespace Drive.Domain.Repositories
                 return file.Id;
             }
         }
+        public static DriveFile GetFile(User loggedUser,string fileName,int FileId)
+        {
+            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
+            {
+                DriveFile file = context.driveFiles.FirstOrDefault(f => f.Name == fileName && f.FileUserId == loggedUser.Id && f.Id == FileId);
+                return file;
+            }
+        }
+        public static void SavingAEditedFile(User loggedUser, string fileName, int fileId, List<string> newFileContent)
+        {
+            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
+            {
+                var file = context.driveFiles.FirstOrDefault(f => f.Name == fileName && f.FileUserId == loggedUser.Id && f.Id == fileId);
+                if (file != null)
+                {
+                    file.Text = string.Join("\n", newFileContent);
+                    file.LastChanges = DateTime.UtcNow;
+                    context.SaveChanges();
+                }
+            }
+        }
+        public static List<string> HandlingBackspaceFileEditings(User loggedUser, string fileName, int fileId, List<string> newFileContent, ref string currentLine)
+        {
+            if (!string.IsNullOrEmpty(currentLine))
+            {
+                currentLine = currentLine.Substring(0, currentLine.Length - 1);
+                Console.Write("\b \b"); 
+            }
+            else if (newFileContent.Count > 0)
+            {
+                currentLine = newFileContent[^1];
+                newFileContent.RemoveAt(newFileContent.Count - 1);
+                Console.Write("\r" + new string(' ', currentLine.Length) + "\r");
+                Console.WriteLine("Zadnji red obrisan."); 
+            }
+            else
+            {
+                Console.WriteLine("Nema reda za brisanje.");
+            }
+
+            return newFileContent;
+        }
+        public static List<string> HandlingEnterFileEditings(User loggedUser, string fileName, int fileId, List<string> newFileContent, ref string currentLine)
+        {
+            if (!string.IsNullOrEmpty(currentLine))
+            {
+                newFileContent.Add(currentLine);
+                currentLine = string.Empty;
+                Console.WriteLine("\nRed dodan.");
+            }
+            return newFileContent;
+        }
+
     }
 }

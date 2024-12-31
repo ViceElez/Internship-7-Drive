@@ -7,6 +7,7 @@ namespace Drive.Presentation.Actions.AccountSettings
     {
         public static void ChangeAccountPassword(User loggedUser)
         {
+            Console.Clear();
             Console.Write("Unesite novu sifru:");
             var newPassword = Console.ReadLine();
             while (true)
