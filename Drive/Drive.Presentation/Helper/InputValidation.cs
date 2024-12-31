@@ -45,7 +45,7 @@ namespace Drive.Presentation.Helper
                     Console.WriteLine("Ime nemoze biti prazno");
                     fileName = ReturnNameOrMenuForNameValidation(loggedUser, fileName, currentFolderId);
                 }
-                else if (!Drive.Domain.Repositories.FileRepository.CheckIfFileExistByName(loggedUser, fileName,currentFolderId))
+                else if (!Drive.Domain.Repositories.FileRepository.CheckIfFileExistByName(loggedUser, fileName, currentFolderId))
                 {
                     Console.WriteLine("Ne postoji file s time imenom.");
                     fileName = ReturnNameOrMenuForNameValidation(loggedUser, fileName, currentFolderId);
@@ -98,7 +98,7 @@ namespace Drive.Presentation.Helper
                         MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
                     }
                 }
-                else if (!Drive.Domain.Repositories.FileRepository.CheckIfFileExistById(loggedUser, fileId,currentFolderId))
+                else if (!Drive.Domain.Repositories.FileRepository.CheckIfFileExistById(loggedUser, fileId, currentFolderId))
                 {
                     Console.WriteLine("Ne postoji file s tim id-om.");
                     var confirmForFolderName = Helper.InputValidation.ConfirmAndDelete();
@@ -120,7 +120,7 @@ namespace Drive.Presentation.Helper
 
             return fileId;
         }
-        public static string FolderNameValidation(User loggedUser,int? currentFolderId)
+        public static string FolderNameValidation(User loggedUser, int? currentFolderId)
         {
             var folderName = Console.ReadLine().Trim();
             while (true)
@@ -128,7 +128,7 @@ namespace Drive.Presentation.Helper
                 if (string.IsNullOrEmpty(folderName))
                 {
                     Console.WriteLine("Ime mape ne moze biti prazno.");
-                    folderName= ReturnNameOrMenuForNameValidation(loggedUser, folderName, currentFolderId);
+                    folderName = ReturnNameOrMenuForNameValidation(loggedUser, folderName, currentFolderId);
                 }
                 else if (!Domain.Repositories.FolderRepositroy.CheckIfFolderExistsByName(folderName, loggedUser, currentFolderId))
                 {
@@ -152,7 +152,7 @@ namespace Drive.Presentation.Helper
 
             while (true)
             {
-                 if (!isIdCorrect)
+                if (!isIdCorrect)
                 {
                     Console.WriteLine("Upisani id mora biti broj.");
                     var confirmForFolderName = Helper.InputValidation.ConfirmAndDelete();
@@ -206,7 +206,7 @@ namespace Drive.Presentation.Helper
 
             return folderId;
         }
-        public static string ReturnNameOrMenuForNameValidation(User loggedUser,string fileName,int? currentFolderId)
+        public static string ReturnNameOrMenuForNameValidation(User loggedUser, string fileName, int? currentFolderId)
         {
             var confirmForFolderName = Helper.InputValidation.ConfirmAndDelete();
             if (confirmForFolderName)

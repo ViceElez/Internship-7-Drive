@@ -8,7 +8,7 @@ namespace Drive.Presentation.Actions.Menus
         public static void MyDiskMenu(User loggedUser, int? currentFolderId)
         {
             while (true)
-            { 
+            {
                 Console.Clear();
                 var currentFolder = FolderRepositroy.GetFolderById(currentFolderId);
                 if (currentFolder == null)
@@ -24,11 +24,11 @@ namespace Drive.Presentation.Actions.Menus
                 switch (commandOption)
                 {
                     case "stvori mapu":
-                        Drive.Presentation.Actions.Folder.FolderActions.CreateFolder(loggedUser,currentFolderId);
+                        Drive.Presentation.Actions.Folder.FolderActions.CreateFolder(loggedUser, currentFolderId);
                         break;
 
                     case "stvori datoteku":
-                        Drive.Presentation.Actions.File.FileActions.CreateFile(loggedUser,currentFolderId);
+                        Drive.Presentation.Actions.File.FileActions.CreateFile(loggedUser, currentFolderId);
                         break;
 
                     case "udi u mapu":
@@ -40,19 +40,19 @@ namespace Drive.Presentation.Actions.Menus
                         break;
 
                     case "izbrisi mapu":
-                         Drive.Presentation.Actions.Folder.FolderActions.DeleteFolder(loggedUser,currentFolderId);
+                        Drive.Presentation.Actions.Folder.FolderActions.DeleteFolder(loggedUser, currentFolderId);
                         break;
 
                     case "izbrisi datoteku":
-                        Drive.Presentation.Actions.File.FileActions.DeleteFile(loggedUser,currentFolderId);
+                        Drive.Presentation.Actions.File.FileActions.DeleteFile(loggedUser, currentFolderId);
                         break;
 
                     case "promijeni naziv mape":
-                        Drive.Presentation.Actions.Folder.FolderActions.ChangeFolderName(loggedUser,currentFolderId);
+                        Drive.Presentation.Actions.Folder.FolderActions.ChangeFolderName(loggedUser, currentFolderId);
                         break;
 
                     case "promijeni naziv datoteke":
-                        Drive.Presentation.Actions.File.FileActions.ChangeFileName(loggedUser,currentFolderId);
+                        Drive.Presentation.Actions.File.FileActions.ChangeFileName(loggedUser, currentFolderId);
                         break;
 
                     case "help":

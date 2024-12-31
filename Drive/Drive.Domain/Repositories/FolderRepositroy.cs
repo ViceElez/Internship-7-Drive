@@ -14,7 +14,7 @@ namespace Drive.Domain.Repositories
             Console.WriteLine("Vasi folderi su:");
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
-                var folders = context.driveFolders .Where(f => f.FolderUserId == loggedUser.Id && f.ParentFolderId == currentFolderId)
+                var folders = context.driveFolders.Where(f => f.FolderUserId == loggedUser.Id && f.ParentFolderId == currentFolderId)
                     .OrderBy(f => f.Name).ToList();
                 foreach (var folder in folders)
                 {
@@ -26,7 +26,7 @@ namespace Drive.Domain.Repositories
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
-                var folder = context.driveFolders.FirstOrDefault(f => f.Id == IdOfFolder && f.ParentFolderId== currentFolderId && f.FolderUserId == loggedUser.Id);
+                var folder = context.driveFolders.FirstOrDefault(f => f.Id == IdOfFolder && f.ParentFolderId == currentFolderId && f.FolderUserId == loggedUser.Id);
                 if (folder != null)
                 {
                     return true;

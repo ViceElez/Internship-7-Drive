@@ -7,12 +7,12 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace Drive.Presentation.Actions.File
 {
-    public class FileActions 
+    public class FileActions
     {
         public static void CreateFile(User loggedUser, int? currentFolderId)
         {
             Console.Write("Upisite ime file-a:");
-            var fileName=Console.ReadLine().Trim();
+            var fileName = Console.ReadLine().Trim();
             while (true)
             {
                 if (string.IsNullOrEmpty(fileName))
@@ -49,7 +49,7 @@ namespace Drive.Presentation.Actions.File
                 MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
             }
         }
-        public static void DeleteFile(User loggedUser,int? currentFolderId)
+        public static void DeleteFile(User loggedUser, int? currentFolderId)
         {
             Console.WriteLine("Upisite ime file-a kojeg zelite izbrisati:");
             var fileNameToDelete = Helper.InputValidation.FileNameValidation(loggedUser, currentFolderId);
@@ -59,9 +59,9 @@ namespace Drive.Presentation.Actions.File
 
             if (Helper.InputValidation.ConfirmAndDelete())
             {
-                if(Domain.Repositories.FileRepository.ReturnTheNumberOfFilesWithSamename(loggedUser, fileNameToDelete) == 1)
-                    fileIdToDelete=Domain.Repositories.FileRepository.GetFileId(loggedUser, fileNameToDelete);
-                Domain.Repositories.FileRepository.DeleteFile(loggedUser, fileIdToDelete,fileNameToDelete);
+                if (Domain.Repositories.FileRepository.ReturnTheNumberOfFilesWithSamename(loggedUser, fileNameToDelete) == 1)
+                    fileIdToDelete = Domain.Repositories.FileRepository.GetFileId(loggedUser, fileNameToDelete);
+                Domain.Repositories.FileRepository.DeleteFile(loggedUser, fileIdToDelete, fileNameToDelete);
                 Console.WriteLine("File uspjesno izbrisan.");
                 Console.ReadKey();
                 MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
@@ -76,7 +76,7 @@ namespace Drive.Presentation.Actions.File
         public static void ChangeFileName(User loggedUser, int? currentFolderId)
         {
             Console.Write("Upisite ime file-a kojem zelite promijeniti ime:");
-            var fileName=Helper.InputValidation.FileNameValidation( loggedUser, currentFolderId);
+            var fileName = Helper.InputValidation.FileNameValidation(loggedUser, currentFolderId);
 
             var IdOfFile = 0;
             if (Domain.Repositories.FileRepository.ReturnTheNumberOfFilesWithSamename(loggedUser, fileName) > 1)
@@ -102,7 +102,7 @@ namespace Drive.Presentation.Actions.File
                         MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
                     }
                 }
-                else if (newFileName==fileName)
+                else if (newFileName == fileName)
                 {
                     Console.WriteLine("Nemozete promijeniti ime u isto.");
                     var confirmForFileName = Helper.InputValidation.ConfirmAndDelete();
@@ -126,7 +126,7 @@ namespace Drive.Presentation.Actions.File
             {
                 if (Domain.Repositories.FileRepository.ReturnTheNumberOfFilesWithSamename(loggedUser, fileName) == 1)
                     IdOfFile = Domain.Repositories.FileRepository.GetFileId(loggedUser, fileName);
-                Domain.Repositories.FileRepository.ChangeFileName(loggedUser, fileName,newFileName, IdOfFile);
+                Domain.Repositories.FileRepository.ChangeFileName(loggedUser, fileName, newFileName, IdOfFile);
                 Console.WriteLine("File-u uspjesno promjenjeno ime.");
                 Console.ReadKey();
                 MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);

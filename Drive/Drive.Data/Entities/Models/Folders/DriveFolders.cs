@@ -6,7 +6,6 @@ namespace Drive.Data.Entities.Models.Folders
 {
     public class DriveFolder
     {
-
         public int Id { get; set; }
         public string Name { get; set; }
         public DateTime CreatedAt { get; set; }
@@ -15,19 +14,18 @@ namespace Drive.Data.Entities.Models.Folders
         public int? ParentFolderId { get; set; }
         public DriveFolder ParentFolder { get; set; }
 
-        public DriveFolder(int ID, string name, int FolderUserID,int FolderParentID)
+        public DriveFolder(int ID, string name, int FolderUserID, int FolderParentID)
         {
             Id = ID;
             Name = name;
-            CreatedAt = DateTime.Now;
+            CreatedAt = DateTime.UtcNow;
             FolderUserId = FolderUserID;
             ParentFolderId = FolderParentID;
         }
-        public DriveFolder()
-        {
-        }
+        public DriveFolder() { }
         public ICollection<DriveFolder> SubFolders { get; set; } = new List<DriveFolder>();
         public ICollection<DriveFile> Files { get; set; } = new List<DriveFile>();
-
+        public ICollection<DriveFolderUser> SharedUsers { get; set; } = new List<DriveFolderUser>(); 
     }
+
 }

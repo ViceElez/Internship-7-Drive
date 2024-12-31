@@ -14,7 +14,7 @@ namespace Drive.Presentation.Actions.Menus
             switch (selectedOption)
             {
                 case 0:
-                    MyDiskMenuActions.MyDiskMenu(loggedUser,null);
+                    MyDiskMenuActions.MyDiskMenu(loggedUser, null);
                     break;
                 case 1:
                     Console.WriteLine("Dijeljeno sa mnom");

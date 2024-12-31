@@ -4,6 +4,7 @@ using Drive.Data.Entities.Models.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
+using Drive.Data.Seed;
 
 namespace Drive.Data.Entities
 {
@@ -19,38 +20,49 @@ namespace Drive.Data.Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<DriveFolder>()
-                .HasOne(f => f.FolderUser)
-                .WithMany(u => u.Folders)
-                .HasForeignKey(f => f.FolderUserId);
-
+            
+            modelBuilder.Entity<DriveFolderUser>()
+                .HasKey(df => new { df.DriveFolderId, df.UserId });
+            modelBuilder.Entity<DriveFileUser>()
+                .HasKey(df => new { df.DriveFileId, df.UserId });
+           
             modelBuilder.Entity<DriveFolder>()
                 .HasOne(f => f.ParentFolder)
-                .WithMany(p => p.SubFolders)
+                .WithMany(pf => pf.SubFolders)
                 .HasForeignKey(f => f.ParentFolderId)
-                .OnDelete(DeleteBehavior.SetNull);
-
-            modelBuilder.Entity<DriveFile>()
-                .HasOne(f => f.FileUser)
-                .WithMany(u => u.Files)
-                .HasForeignKey(f => f.FileUserId);
-
+                .OnDelete(DeleteBehavior.Restrict);
+          
             modelBuilder.Entity<DriveFile>()
                 .HasOne(f => f.Folder)
-                .WithMany(d => d.Files)
-                .HasForeignKey(f => f.FolderId);
+                .WithMany(f => f.Files)
+                .HasForeignKey(f => f.FolderId)
+                .OnDelete(DeleteBehavior.Cascade); 
+        
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Email)
+                .IsUnique(); 
+         
+            modelBuilder.Entity<DriveFileUser>()
+                .HasIndex(df => df.DriveFileId) 
+                .IsUnique(); 
+            modelBuilder.Entity<DriveFolderUser>()
+                .HasIndex(df => df.DriveFolderId) 
+                .IsUnique();
 
-            Seed.DatabaseSeeder.Seed(modelBuilder);
+
+            DataBaseSeeder.Seed(modelBuilder);
             base.OnModelCreating(modelBuilder);
         }
+
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=Drive1;User Id=postgres;Password=gR4)0Lo2Q;");
+                optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=Drive;User Id=postgres;Password=gR4)0Lo2Q;")
+                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             }
         }
-
     }
 
     public class DriveDbContextFactory : IDesignTimeDbContextFactory<DriveDbContext>
@@ -59,10 +71,10 @@ namespace Drive.Data.Entities
         {
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("C:\\Users\\leona\\Desktop\\Vice\\dumpInternship-2425\\Internship-7-Drive\\Drive\\Drive.Presentation\\appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
-            var connectionString = configuration.GetConnectionString("Drive1");
+            var connectionString = configuration.GetConnectionString("Drive");
 
             var optionsBuilder = new DbContextOptionsBuilder<DriveDbContext>();
             optionsBuilder.UseNpgsql(connectionString);

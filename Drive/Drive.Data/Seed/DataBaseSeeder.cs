@@ -1,95 +1,65 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Drive.Data.Entities.Models.Users;
-using Drive.Data.Entities.Models.Folders;
+﻿using Drive.Data.Entities.Models.Comments;
 using Drive.Data.Entities.Models.Files;
+using Drive.Data.Entities.Models.Folders;
+using Drive.Data.Entities.Models.Users;
+using Microsoft.EntityFrameworkCore;
 
 namespace Drive.Data.Seed
 {
-    public class DatabaseSeeder
+    public static class DataBaseSeeder
     {
-        public static void Seed(ModelBuilder builder)
+        public static void Seed(ModelBuilder modelBuilder)
         {
-            builder.Entity<User>().HasData(new List<User>
+            modelBuilder.Entity<User>().HasData(new List<User>
             {
-                new User
-                {
-                    Id = 1,
-                    Email = "ivana@vip.com",
-                    Password = "password123",
-                },
-                new User
-                {
-                    Id = 2,
-                    Email = "josip@yahoo.pro",
-                    Password = "password456",
-                },
-                new User
-                {
-                    Id = 3,
-                    Email = "mario@abc.com",
-                    Password = "password789",
-                },
-                new User
-                {
-                    Id = 4,
-                    Email = "luka@gmail.com",
-                    Password = "password000",
-                },
-                new User
-                {
-                    Id = 5,
-                    Email = "ana@domain.com",
-                    Password = "password111",
-                },
-                new User
-                {
-                    Id = 6,
-                    Email = "nikola@company.com",
-                    Password = "password222",
-                }
+                new User { Id = 1, Email = "alice@example.com", Password = "password123" },
+                new User { Id = 2, Email = "bob@example.com", Password = "password456" },
+                new User { Id = 3, Email = "charlie@example.com", Password = "password789" },
+                new User { Id = 4, Email = "david@example.com", Password = "password101" },
+                new User { Id = 5, Email = "emma@example.com", Password = "password112" }
             });
 
-            builder.Entity<DriveFolder>().HasData(new List<DriveFolder>
+            modelBuilder.Entity<DriveFolder>().HasData(new List<DriveFolder>
             {
-                new DriveFolder { Id = 1, Name = "Work", FolderUserId = 1, ParentFolderId = null }, 
-                new DriveFolder { Id = 2, Name = "Work/Reports", FolderUserId = 1, ParentFolderId = 1 },
-                new DriveFolder { Id = 3, Name = "Work/Presentations", FolderUserId = 1, ParentFolderId = 1 },
-
-                new DriveFolder { Id = 4, Name = "Personal", FolderUserId = 1, ParentFolderId = null }, 
-                new DriveFolder { Id = 5, Name = "Personal/Photos", FolderUserId = 1, ParentFolderId = 4 },
-                new DriveFolder { Id = 6, Name = "Personal/Videos", FolderUserId = 1, ParentFolderId = 4 },
-
-                new DriveFolder { Id = 7, Name = "Projects", FolderUserId = 2, ParentFolderId = null }, 
-                new DriveFolder { Id = 8, Name = "Projects/Website", FolderUserId = 2, ParentFolderId = 7 },
-                new DriveFolder { Id = 9, Name = "Projects/App", FolderUserId = 2, ParentFolderId = 7 },
-
-                new DriveFolder { Id = 10, Name = "Finance", FolderUserId = 3, ParentFolderId = null }, 
-                new DriveFolder { Id = 11, Name = "Finance/Invoices", FolderUserId = 3, ParentFolderId = 10 },
-                new DriveFolder { Id = 12, Name = "Finance/Budgets", FolderUserId = 3, ParentFolderId = 10 },
-
-                new DriveFolder { Id = 13, Name = "Designs", FolderUserId = 5, ParentFolderId = null }, 
-                new DriveFolder { Id = 14, Name = "Designs/UI", FolderUserId = 5, ParentFolderId = 13 },
-                new DriveFolder { Id = 15, Name = "Designs/UX", FolderUserId = 5, ParentFolderId = 13 },
-
-                new DriveFolder { Id = 16, Name = "Development", FolderUserId = 6, ParentFolderId = null }, 
-                new DriveFolder { Id = 17, Name = "Development/Backend", FolderUserId = 6, ParentFolderId = 16 },
-                new DriveFolder { Id = 18, Name = "Development/Frontend", FolderUserId = 6, ParentFolderId = 16 }
+                new DriveFolder { Id = 1, Name = "Dokumenti", CreatedAt = DateTime.Now, FolderUserId = 1 },
+                new DriveFolder { Id = 2, Name = "Rad", CreatedAt = DateTime.Now, FolderUserId = 2, ParentFolderId = 1 },
+                new DriveFolder { Id = 3, Name = "Osobno", CreatedAt = DateTime.Now, FolderUserId = 3, ParentFolderId = 1 },
+                new DriveFolder { Id = 4, Name = "PraznaMapa", CreatedAt = DateTime.Now, FolderUserId = 4 }
             });
 
-            builder.Entity<DriveFile>().HasData(new List<DriveFile>
+            modelBuilder.Entity<DriveFile>().HasData(new List<DriveFile>
             {
-                new DriveFile { Id = 1, Name = "Resume.pdf", Text = "Resume content", FileUserId = 1, FolderId = null },
-                new DriveFile { Id = 2, Name = "ProjectPlan.docx", Text = "Project Plan content", FileUserId = 1, FolderId = null },
-                new DriveFile { Id = 3, Name = "Budget.xlsx", Text = "Budget content", FileUserId = 1, FolderId = null },
-                new DriveFile { Id = 4, Name = "Hobbies.txt", Text = "Hobbies content", FileUserId = 2, FolderId = null },
-                new DriveFile { Id = 5, Name = "ToDoList.docx", Text = "ToDo list content", FileUserId = 2, FolderId = null },
-                new DriveFile { Id = 6, Name = "Notes.txt", Text = "Notes content", FileUserId = 3, FolderId = null },
-                new DriveFile { Id = 7, Name = "Presentation.pptx", Text = "Presentation content", FileUserId = 3, FolderId = null },
-                new DriveFile { Id = 8, Name = "Invoice.pdf", Text = "Invoice content", FileUserId = 4, FolderId = null },
-                new DriveFile { Id = 9, Name = "MeetingNotes.doc", Text = "Meeting notes content", FileUserId = 5, FolderId = null },
-                new DriveFile { Id = 10, Name = "ProductDesign.png", Text = "Product design content", FileUserId = 5, FolderId = null },
-                new DriveFile { Id = 11, Name = "CodeSnippet.cs", Text = "Code snippet content", FileUserId = 6, FolderId = null },
-                new DriveFile { Id = 12, Name = "SetupGuide.md", Text = "Setup guide content", FileUserId = 6, FolderId = null }
+                new DriveFile { Id = 1, Name = "ProjektniPrijedlog.pdf", Text = "Projektni prijedlog koji detaljno opisuje ciljeve i plan.", FileUserId = 1, FolderId = 2 },
+                new DriveFile { Id = 2, Name = "MjesečniIzvještaj.docx", Text = "Mjesečni financijski izvještaj koji sažima ključne metrike.", FileUserId = 2, FolderId = 1 },
+                new DriveFile { Id = 3, Name = "OsobniDnevnik.txt", Text = "Dnevnički zapisi koji bilježe osobne refleksije.", FileUserId = 3, FolderId = 3 },
+                new DriveFile { Id = 4, Name = "ZbirkaFotografija.zip", Text = "Kolekcija fotografija s odmora.", FileUserId = 4, FolderId = 4 },
+                new DriveFile { Id = 5, Name = "Upute.txt", Text = "Korak-po-korak upute za postavljanje sustava.", FileUserId = 5, FolderId = 4 }
+            });
+
+            modelBuilder.Entity<DriveComments>().HasData(new List<DriveComments>
+            {
+                new DriveComments { Id = 1, Content = "Ovo izgleda super! Pregledajmo i završimo.", FileId = 1, UserId = 2, CreatedAt = DateTime.UtcNow },
+                new DriveComments { Id = 2, Content = "Izvrstan napredak na izvještaju.", FileId = 2, UserId = 3, CreatedAt = DateTime.UtcNow },
+                new DriveComments { Id = 3, Content = "Hvala na dijeljenju dnevničkih zapisa.", FileId = 3, UserId = 4, CreatedAt = DateTime.UtcNow },
+                new DriveComments { Id = 4, Content = "Prekrasne fotografije! Moram ih provjeriti.", FileId = 4, UserId = 1, CreatedAt = DateTime.UtcNow },
+                new DriveComments { Id = 5, Content = "Ove upute će mi biti vrlo korisne.", FileId = 5, UserId = 2, CreatedAt = DateTime.UtcNow }
+            });
+
+            modelBuilder.Entity<DriveFileUser>().HasData(new List<DriveFileUser>
+            {
+                new DriveFileUser { DriveFileId = 1, UserId = 2 },
+                new DriveFileUser { DriveFileId = 2, UserId = 3 },
+                new DriveFileUser { DriveFileId = 3, UserId = 4 },
+                new DriveFileUser { DriveFileId = 4, UserId = 1 },
+                new DriveFileUser { DriveFileId = 5, UserId = 2 }
+            });
+
+            modelBuilder.Entity<DriveFolderUser>().HasData(new List<DriveFolderUser>
+            {
+                new DriveFolderUser { DriveFolderId = 1, UserId = 2 },
+                new DriveFolderUser { DriveFolderId = 2, UserId = 3 },
+                new DriveFolderUser { DriveFolderId = 2, UserId = 4 },
+                new DriveFolderUser { DriveFolderId = 3, UserId = 4 }
             });
         }
     }

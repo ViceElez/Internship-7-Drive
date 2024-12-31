@@ -7,7 +7,7 @@ namespace Drive.Presentation.Actions.AccountSettings
     {
         public static void AccountSettingsMenu(User loggedUser)
         {
-            string[] accountSettingsOptions = new string[] {"Promjena emaila","Promjena lozinke", "Povratak"  };
+            string[] accountSettingsOptions = new string[] { "Promjena emaila", "Promjena lozinke", "Povratak" };
             var menu = new DriveMenu(accountSettingsOptions);
             int selectedOption = menu.Run();
             switch (selectedOption)

@@ -67,7 +67,7 @@ namespace Drive.Presentation.Actions.AccountSettings
 
             if (Helper.InputValidation.ConfirmAndDelete())
             {
-                loggedUser=Drive.Domain.Repositories.UserRepository.ChangeAccountEmail(newEmail, loggedUser);
+                loggedUser = Drive.Domain.Repositories.UserRepository.ChangeAccountEmail(newEmail, loggedUser);
                 Console.WriteLine("Email uspjesno promijenjen!");
                 Console.ReadKey();
                 AccountSettingActions.AccountSettingsMenu(loggedUser);

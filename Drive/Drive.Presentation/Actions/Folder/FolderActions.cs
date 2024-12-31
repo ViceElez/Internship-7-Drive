@@ -7,7 +7,7 @@ namespace Drive.Presentation.Actions.Folder
 {
     public class FolderActions // moras jos seedat jer su se samo neki folderi seedali, i triba dodat da imaju oni opciju za shareat to vidi kako i  commentar koji samo moze bit ako je ovi folder javan valjda svima
     {
-        public static void CreateFolder(User loggedUser,int? currentFolderId)
+        public static void CreateFolder(User loggedUser, int? currentFolderId)
         {
             Console.Write("Upisite ime nove mape:");
             var folderName = Console.ReadLine().Trim();
@@ -49,10 +49,10 @@ namespace Drive.Presentation.Actions.Folder
                 MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
             }
         }
-        public static void DeleteFolder(User loggedUser,int? currentFolderId)
+        public static void DeleteFolder(User loggedUser, int? currentFolderId)
         {
             Console.Write("Upisite ime foldera kojeg zelite izbrisati:");
-            var folderName=Helper.InputValidation.FolderNameValidation(loggedUser, currentFolderId);
+            var folderName = Helper.InputValidation.FolderNameValidation(loggedUser, currentFolderId);
 
             var folderId = 0;
             if (Domain.Repositories.FolderRepositroy.ReturnTheNumberOfFoldersWithSamename(loggedUser, folderName) > 1)
@@ -60,9 +60,9 @@ namespace Drive.Presentation.Actions.Folder
 
             if (Helper.InputValidation.ConfirmAndDelete())
             {
-                if(Domain.Repositories.FolderRepositroy.ReturnTheNumberOfFoldersWithSamename(loggedUser,folderName)==1)
-                    folderId=Domain.Repositories.FolderRepositroy.GetFolderId(loggedUser,folderName);
-                Domain.Repositories.FolderRepositroy.DeleteFolder(loggedUser, folderId,folderName);
+                if (Domain.Repositories.FolderRepositroy.ReturnTheNumberOfFoldersWithSamename(loggedUser, folderName) == 1)
+                    folderId = Domain.Repositories.FolderRepositroy.GetFolderId(loggedUser, folderName);
+                Domain.Repositories.FolderRepositroy.DeleteFolder(loggedUser, folderId, folderName);
                 Console.WriteLine("Folder uspjesno izbrisan.");
                 Console.ReadKey();
                 MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
@@ -74,7 +74,7 @@ namespace Drive.Presentation.Actions.Folder
                 MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
             }
         }
-        public static void ChangeFolderName(User loggedUser,int? currentFolderId)
+        public static void ChangeFolderName(User loggedUser, int? currentFolderId)
         {
             Console.Write("Upisite ime foldera kojem zelite promijeniti ime:");
             var folderName = Helper.InputValidation.FolderNameValidation(loggedUser, currentFolderId);
@@ -103,13 +103,13 @@ namespace Drive.Presentation.Actions.Folder
                         MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
                     }
                 }
-                else if (newFolderName==folderName)
+                else if (newFolderName == folderName)
                 {
                     Console.WriteLine("Nemozete promijeniti ime foldera u isto.");
                     var confirmForFolderName = Helper.InputValidation.ConfirmAndDelete();
                     if (confirmForFolderName)
                     {
-                        Console.Write("Unesite ime:");  
+                        Console.Write("Unesite ime:");
                         newFolderName = Console.ReadLine().Trim();
                     }
                     else
@@ -127,7 +127,7 @@ namespace Drive.Presentation.Actions.Folder
             {
                 if (Domain.Repositories.FolderRepositroy.ReturnTheNumberOfFoldersWithSamename(loggedUser, folderName) == 1)
                     folderId = Domain.Repositories.FolderRepositroy.GetFolderId(loggedUser, folderName);
-                Domain.Repositories.FolderRepositroy.ChangeFolderName(loggedUser,folderName,newFolderName, folderId);
+                Domain.Repositories.FolderRepositroy.ChangeFolderName(loggedUser, folderName, newFolderName, folderId);
                 Console.WriteLine("Folderu uspjesno promjenjeno ime.");
                 Console.ReadKey();
                 MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
@@ -154,7 +154,7 @@ namespace Drive.Presentation.Actions.Folder
                     folderId = Domain.Repositories.FolderRepositroy.GetFolderId(loggedUser, folderName);
                 Console.WriteLine("Uspjesan ulazak u folder.");
                 Console.ReadKey();
-                MyDiskMenuActions.MyDiskMenu(loggedUser,folderId);
+                MyDiskMenuActions.MyDiskMenu(loggedUser, folderId);
 
             }
             else

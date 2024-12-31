@@ -22,6 +22,8 @@ namespace Drive.Data.Entities.Models.Users
 
         public ICollection<DriveFolder> Folders { get; set; } = new List<DriveFolder>();
         public ICollection<DriveFile> Files { get; set; } = new List<DriveFile>();
+        public ICollection<DriveFolderUser> SharedFolders { get; set; } = new List<DriveFolderUser>();
+        public ICollection<DriveFileUser> SharedFiles { get; set; } = new List<DriveFileUser>();
 
     }
 }

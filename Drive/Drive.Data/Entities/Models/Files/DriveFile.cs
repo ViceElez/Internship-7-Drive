@@ -1,5 +1,6 @@
 ﻿using Drive.Data.Entities.Models.Users;
 using Drive.Data.Entities.Models.Folders;
+using Drive.Data.Entities.Models.Comments;
 
 namespace Drive.Data.Entities.Models.Files
 {
@@ -7,7 +8,7 @@ namespace Drive.Data.Entities.Models.Files
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string Text { get; set; }
+        public string? Text { get; set; }
         public int FileUserId { get; set; }
         public User FileUser { get; set; }
         public DateTime LastChanges { get; set; }
@@ -21,12 +22,15 @@ namespace Drive.Data.Entities.Models.Files
             Text = text;
             FileUserId = FileUserID;
             FolderId = FolderID;
-            LastChanges = DateTime.Now;
+            LastChanges = DateTime.UtcNow;
         }
 
         public DriveFile()
         {
         }
+
+        public ICollection<DriveFileUser> SharedFiles { get; set; } = new List<DriveFileUser>();
+        public ICollection<DriveComments> DriveComments { get; set; } = new List<DriveComments>();
 
 
     }
