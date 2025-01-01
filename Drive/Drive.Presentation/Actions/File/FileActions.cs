@@ -210,6 +210,116 @@ namespace Drive.Presentation.Actions.File
                 }
             }
         }
+        public static void ShareFile(User loggedUser,int? currentFolderId)
+        {
+            Console.WriteLine("Upisite ime file-a koji zelite podijeliti:");
+            var fileName = Helper.InputValidation.FileNameValidation(loggedUser, currentFolderId);
+
+            var fileId = 0;
+            if (Domain.Repositories.FileRepository.ReturnTheNumberOfFilesWithSamename(loggedUser, fileName) > 1)
+                fileId = Helper.InputValidation.FileIdValidation(loggedUser, fileName, currentFolderId);
+
+            if (Domain.Repositories.FileRepository.ReturnTheNumberOfFilesWithSamename(loggedUser, fileName) == 1)
+                fileId = Domain.Repositories.FileRepository.GetFileId(loggedUser, fileName);
+
+            Domain.Repositories.UserRepository.ListAllUsers();
+            while (true)
+            {
+                Console.Write("Upisite email korisnika kojem zelite podijeliti file(kada dodate sve zeljene korisnike upisite 'stop'):");
+                var userEmail = Console.ReadLine().Trim();
+                if(userEmail.ToLower().Trim() == "stop")
+                    break;
+                else
+                {
+                    while (true)
+                    {
+                        if (string.IsNullOrEmpty(userEmail))
+                        {
+                            Console.WriteLine("Email nemoze biti prazan.");
+                            var confirmForEmail = Helper.InputValidation.ConfirmAndDelete();
+                            if (confirmForEmail)
+                            {
+                                Console.Write("Unesite email:");
+                                userEmail = Console.ReadLine().Trim();
+                            }
+                            else
+                            {
+                                Console.WriteLine("Proces je prekinut.");
+                                Console.ReadKey();
+                                MainMenuActions.MainMenu();
+                            }
+                        }
+                        else if (!Helper.InputValidation.IsValid(userEmail))
+                        {
+                            Console.WriteLine("Neipsravan format email-a.");
+                            var confirmForEmail = Helper.InputValidation.ConfirmAndDelete();
+                            if (confirmForEmail)
+                            {
+                                Console.Write("Unesite email:");
+                                userEmail = Console.ReadLine().Trim();
+                            }
+                            else
+                            {
+                                Console.WriteLine("Proces je prekinut.");
+                                Console.ReadKey();
+                                MainMenuActions.MainMenu();
+                            }
+                        }
+                        else if (!Drive.Domain.Repositories.UserRepository.EmailExists(userEmail))
+                        {
+                            Console.WriteLine("Ne postoji racun s tim emailom");
+                            var confirmForEmail = Helper.InputValidation.ConfirmAndDelete();
+                            if (confirmForEmail)
+                            {
+                                Console.Write("Unesite email:");
+                                userEmail = Console.ReadLine().Trim();
+                            }
+                            else
+                            {
+                                Console.WriteLine("Proces je prekinut.");
+                                Console.ReadKey();
+                                MainMenuActions.MainMenu();
+                            }
+
+                        }
+                        else if (userEmail == loggedUser.Email)
+                        {
+                            Console.WriteLine("Ne mozete podijeliti file sami sa sobom.");
+                            var confirmForEmail = Helper.InputValidation.ConfirmAndDelete();
+                            if (confirmForEmail)
+                            {
+                                Console.Write("Unesite email:");
+                                userEmail = Console.ReadLine().Trim();
+                            }
+                            else
+                            {
+                                Console.WriteLine("Proces je prekinut.");
+                                Console.ReadKey();
+                                MainMenuActions.MainMenu();
+                            }
+                        }
+                        else
+                        {
+                            if (Domain.Repositories.FileRepository.ShareFile(loggedUser, fileId, userEmail))
+                            {
+                                Console.WriteLine("File uspjesno podijeljen.");
+                                Console.ReadKey();
+                                break;
+                            }
+                            else
+                            {
+                                Console.WriteLine("File je vec podijeljen s tim korisnikom.");
+                                Console.ReadKey();
+                                break;
+                            }
+                        }
+                    }
+                }
+
+            }
+            MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
+
+        }
 
 
     }

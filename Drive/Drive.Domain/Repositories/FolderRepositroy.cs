@@ -122,5 +122,29 @@ namespace Drive.Domain.Repositories
                 return folder;
             }
         }
+        public static bool ShareFolder(User loggedUser, int folderId, string email)
+        {
+            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
+            {
+                var user = context.Users.FirstOrDefault(u => u.Email == email);
+                if (user == null)
+                {
+                    return false;
+                }
+                var folder = context.driveFolders.FirstOrDefault(f => f.Id == folderId && f.FolderUserId == loggedUser.Id);
+                if (folder == null)
+                {
+                    return false;
+                }
+                var sharedFolder = new DriveFolderUser
+                {
+                    DriveFolderId = folderId,
+                    UserId = user.Id
+                };
+                context.driveFolderUsers.Add(sharedFolder);
+                context.SaveChanges();
+                return true;
+            }
+        }
     }
 }

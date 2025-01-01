@@ -2,7 +2,6 @@
 using Drive.Data.Entities.Models.Users;
 using Microsoft.EntityFrameworkCore;
 using Drive.Data.Entities.Models.Files;
-using System.Security;
 
 namespace Drive.Domain.Repositories
 {
@@ -166,6 +165,32 @@ namespace Drive.Domain.Repositories
                 Console.WriteLine("\nRed dodan.");
             }
             return newFileContent;
+        }
+        public static bool ShareFile(User loggedUser, int fileId, string addedUser)
+        {
+            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
+            {
+                var file = context.driveFiles.FirstOrDefault(f => f.Id == fileId && f.FileUserId == loggedUser.Id);
+                if (file != null)
+                {
+                    var isAlreadyShared = context.driveFileUsers.Any(df => df.DriveFileId == fileId && df.UserId == user.Id);
+                    if (isAlreadyShared)
+                        return false;
+
+                    var user = context.Users.FirstOrDefault(u => u.Email == addedUser);
+                    if (user != null)
+                    {
+                        var sharedFile = new DriveFileUser
+                        {
+                            DriveFileId = fileId,
+                            UserId = user.Id
+                        };
+                        context.driveFileUsers.Add(sharedFile);
+                        context.SaveChanges();
+                    }
+                }
+            }
+            return true;
         }
 
     }

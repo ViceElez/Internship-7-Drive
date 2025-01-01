@@ -226,7 +226,8 @@ namespace Drive.Presentation.Helper
         public static void ListAllFunctions()
         {
             Console.WriteLine("1. Stvori mapu\n2. Stvori datoteku\n3. Udi u mapu\n4. Uredi datoteku" +
-                "\n5. Izbrisi mapu\n6. Izbrisi datoteku\n7. Promijeni naziv mape\n8. Promijeni naziv datoteke\n9. Povratak");
+                "\n5. Izbrisi mapu\n6. Izbrisi datoteku\n7. Promijeni naziv mape\n8. Promijeni naziv datoteke\n9. Podijeli mapu\n" +
+                "10. Podijeli datoteku\n11. Prestani dijelit mapu\n12. Prestani dijelit datoteku\n13.Povratak");
             Console.ReadKey();
         }
         public static void ListAllEditFileFunctions()

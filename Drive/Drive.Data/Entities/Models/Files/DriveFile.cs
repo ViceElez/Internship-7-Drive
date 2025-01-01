@@ -29,7 +29,7 @@ namespace Drive.Data.Entities.Models.Files
         {
         }
 
-        public ICollection<DriveFileUser> SharedFiles { get; set; } = new List<DriveFileUser>();
+        public ICollection<DriveFileUser> SharedUsers { get; set; } = new List<DriveFileUser>();
         public ICollection<DriveComments> DriveComments { get; set; } = new List<DriveComments>();
 
 

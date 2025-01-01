@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using Drive.Data.Seed;
+using Drive.Data.Entities.Models.Comments;
 
 namespace Drive.Data.Entities
 {
@@ -17,6 +18,9 @@ namespace Drive.Data.Entities
         public DbSet<DriveFile> driveFiles => Set<DriveFile>();
         public DbSet<DriveFolder> driveFolders => Set<DriveFolder>();
         public DbSet<User> Users => Set<User>();
+        public DbSet<DriveFileUser> driveFileUsers => Set<DriveFileUser>();
+        public DbSet<DriveFolderUser> driveFolderUsers => Set<DriveFolderUser>();
+        public DbSet<DriveComments> driveComments => Set<DriveComments>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

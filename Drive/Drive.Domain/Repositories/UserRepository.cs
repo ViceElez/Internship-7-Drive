@@ -7,7 +7,6 @@ namespace Drive.Domain.Repositories
     public class UserRepository : BaseRepository
     {
         public UserRepository(DriveDbContext dbContext) : base(dbContext) { }
-
         public static bool EmailExists(string email)
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
@@ -15,7 +14,6 @@ namespace Drive.Domain.Repositories
                 return context.Users.Any(u => u.Email == email);
             }
         }
-
         public static bool ConfirmPassword(string email, string password)
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
@@ -23,7 +21,6 @@ namespace Drive.Domain.Repositories
                 return context.Users.Any(u => u.Email == email && u.Password == password);
             }
         }
-
         public static User GetUserByEmail(string email)
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
@@ -31,7 +28,6 @@ namespace Drive.Domain.Repositories
                 return context.Users.FirstOrDefault(u => u.Email == email);
             }
         }
-
         public static void AddUser(string email, string password)
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
@@ -45,7 +41,6 @@ namespace Drive.Domain.Repositories
                 context.SaveChanges();
             }
         }
-
         public static string GenerateCaptcha()
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -59,7 +54,6 @@ namespace Drive.Domain.Repositories
 
             return captcha;
         }
-
         public static bool CheckCaptcha(string generatedCaptcha, string enteredCaptcha)
         {
             if (generatedCaptcha == enteredCaptcha)
@@ -69,7 +63,6 @@ namespace Drive.Domain.Repositories
             else
                 return false;
         }
-
         public static User ChangeAccountEmail(string newEmail, User loggedUser)
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
@@ -80,7 +73,6 @@ namespace Drive.Domain.Repositories
                 return user;
             }
         }
-
         public static void ChangeAccountPassword(string newPassword, User loggedUser)
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
@@ -88,6 +80,17 @@ namespace Drive.Domain.Repositories
                 var user = context.Users.FirstOrDefault(u => u.Email == loggedUser.Email);
                 user.Password = newPassword;
                 context.SaveChanges();
+            }
+        }
+        public static void ListAllUsers()
+        {
+            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
+            {
+                var users = context.Users.ToList();
+                foreach (var user in users)
+                {
+                    Console.WriteLine($"Id: {user.Id}, Email: {user.Email}");
+                }
             }
         }
 
