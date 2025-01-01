@@ -273,6 +273,36 @@ namespace Drive.Presentation.Actions.Folder
             }
             MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
         }
+        public static void EnterSharedFolder(User loggedUser, int? currentFolderId)
+        {
+            Console.Write("Upisite ime foldera u koji zelite uci:");
+            var folderName = Helper.InputValidation.SharedFolderNameValidation(loggedUser, currentFolderId);
+
+            var folderId = 0;
+            if (Domain.Repositories.FolderRepositroy.ReturnTheNumberOfSharedFoldersWithSamename(loggedUser, folderName) > 1)
+                folderId = Helper.InputValidation.SharedFolderIdValidation(loggedUser, folderName, currentFolderId);
+
+            if (Helper.InputValidation.ConfirmAndDelete())
+            {
+                if (Domain.Repositories.FolderRepositroy.ReturnTheNumberOfSharedFoldersWithSamename(loggedUser, folderName) == 1)
+                    folderId = Domain.Repositories.FolderRepositroy.GetSharedFolderId(loggedUser, folderName);
+                Console.WriteLine("Uspjesan ulazak u folder.");
+                Console.ReadKey();
+                SharedWithMeMenuActions.SharedDiskMenu(loggedUser, folderId);
+
+            }
+            else
+            {
+                Console.WriteLine("Proces je prekinut.");
+                Console.ReadKey();
+                MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
+            }
+        }
+        public static void DeleteSharedFolder(User loggedUser, int? currentFolderId)
+        {
+
+        }
+
 
     }
 }

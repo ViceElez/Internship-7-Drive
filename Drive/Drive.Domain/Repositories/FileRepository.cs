@@ -83,11 +83,11 @@ namespace Drive.Domain.Repositories
                 return filesWithSameName.Count;
             }
         }
-        public static void ListAllFilesWithSameName(User loggedUser, string fileName)
+        public static void ListAllFilesWithSameName(User loggedUser, string fileName, int? currentFolderId)
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
-                var files = context.driveFiles.Where(f => f.FileUserId == loggedUser.Id && f.Name == fileName).ToList();
+                var files = context.driveFiles.Where(f => f.FileUserId == loggedUser.Id && f.Name == fileName && f.FolderId == currentFolderId).ToList();
                 foreach (var file in files)
                 {
                     Console.WriteLine($"{file.Id}-{file.Name}");
@@ -173,7 +173,7 @@ namespace Drive.Domain.Repositories
                 var file = context.driveFiles.FirstOrDefault(f => f.Id == fileId && f.FileUserId == loggedUser.Id);
                 if (file != null)
                 {
-                    var isAlreadyShared = context.driveFileUsers.Any(df => df.DriveFileId == fileId && df.UserId == user.Id);
+                    var isAlreadyShared = context.driveFileUsers.Any(df => df.DriveFileId == fileId && df.UserId == loggedUser.Id);
                     if (isAlreadyShared)
                         return false;
 
@@ -191,6 +191,72 @@ namespace Drive.Domain.Repositories
                 }
             }
             return true;
+        }
+        public static void ListAllSharedFiles(User loggedUser, int? currentFolderId)
+        {
+            using (var context= new DriveDbContext(new DbContextOptions<DriveDbContext>()))
+            {
+                var sharedFiles = context.driveFileUsers.Where(df => df.UserId == loggedUser.Id) .Select(df => df.DriveFileId).ToList();
+
+                var orderedFiles = context.driveFiles.Where(f => sharedFiles.Contains(f.Id)) .OrderByDescending(f => f.LastChanges).ToList();
+
+                foreach (var file in orderedFiles)
+                {
+                    Console.WriteLine($"{file.Id}-{file.Name}");
+                }
+            }
+        }
+        public static void ListAllSharedFilesWithTheSameName(User loggedUser, string fileName, int? currentFolderId)
+        {
+            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
+            {
+                var sharedFiles = context.driveFileUsers.Where(df => df.UserId == loggedUser.Id).Select(df => df.DriveFileId).ToList();
+
+                var orderedFiles = context.driveFiles .Where(f => sharedFiles.Contains(f.Id) && f.Name == fileName && f.FolderId == currentFolderId)
+                    .OrderByDescending(f => f.LastChanges)
+                    .ToList();
+
+                foreach (var file in orderedFiles)
+                {
+                    Console.WriteLine($"{file.Id}-{file.Name}");
+                }
+            }
+        }
+        public static bool CheckIfFileExistInSharedFileById(User loggedUser, int IdOfFile, int? currentFolderId)
+        {
+            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
+            {
+                var sharedFile = context.driveFileUsers
+                    .Any(df => df.UserId == loggedUser.Id && df.DriveFileId == IdOfFile);
+
+                if (sharedFile)
+                {
+                    var file = context.driveFiles
+                        .FirstOrDefault(f => f.Id == IdOfFile && f.FolderId == currentFolderId);
+
+                    return file != null;
+                }
+
+                return false;
+            }
+        }
+        public static bool CheckIfFileExistInSharedFileByName(User loggedUser, string NameOfFile, int? currentFileId)
+        {
+            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
+            {
+                var sharedFile = context.driveFileUsers
+                    .Any(df => df.UserId == loggedUser.Id && df.DriveFile.Name == NameOfFile);
+
+                if (sharedFile)
+                {
+                    var file = context.driveFiles
+                        .FirstOrDefault(f => f.Name == NameOfFile && f.FolderId == currentFileId);
+
+                    return file != null;
+                }
+
+                return false;
+            }
         }
 
     }

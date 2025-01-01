@@ -15,8 +15,10 @@ namespace Drive.Presentation.Actions.Menus
                     Console.WriteLine("Nalazite se u pocetnom folderu.\n");
                 else
                     Console.WriteLine($"Nalazite se u {currentFolder.Name} folderu.\n");
+                Console.WriteLine("Vasi folderi su:");
                 FolderRepositroy.ListAllFolders(loggedUser, currentFolderId);
                 Console.WriteLine();
+                Console.WriteLine("Vasi file-ovi su:");
                 FileRepository.ListAllFiles(loggedUser, currentFolderId);
                 Console.WriteLine("Upisite komandu za rad s datotekama (ili upisite 'help' za popis komandi):");
                 var commandOption = Console.ReadLine().Trim().ToLower();
@@ -62,6 +64,9 @@ namespace Drive.Presentation.Actions.Menus
                     case "povratak":
                         DriveMenuActions.DriveMenu(loggedUser);
                         return;
+                    case "navigacija":
+
+                        break;
 
                     default:
                         Console.WriteLine("Nepostojeca komanda. Zelite li vidjeti popis svih komandi? (da/ne)");

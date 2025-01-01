@@ -17,7 +17,7 @@ namespace Drive.Presentation.Actions.Menus
                     MyDiskMenuActions.MyDiskMenu(loggedUser, null);
                     break;
                 case 1:
-                    Console.WriteLine("Dijeljeno sa mnom");
+                    SharedWithMeMenuActions.SharedDiskMenu(loggedUser, null);
                     break;
                 case 2:
                     AccountSettings.AccountSettingActions.AccountSettingsMenu(loggedUser);
