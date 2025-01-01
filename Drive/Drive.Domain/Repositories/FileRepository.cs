@@ -10,7 +10,6 @@ namespace Drive.Domain.Repositories
         public FileRepository(DriveDbContext dbContext) : base(dbContext) { }
         public static void ListAllFiles(User loggedUser, int? folderId)
         {
-            Console.WriteLine("Vasi file-ovi su:");
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
                 var files = context.driveFiles.Where(f => f.FileUserId == loggedUser.Id && f.FolderId == folderId)
@@ -289,15 +288,45 @@ namespace Drive.Domain.Repositories
                 return file.Id;
             }
         }
+        public static DriveFile GetSharedFile(User loggedUser, string fileName,int fileId)
+        {
+            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
+            {
+                var sharedFile = context.driveFileUsers
+                    .Where(df => df.UserId == loggedUser.Id)
+                    .Select(df => df.DriveFileId)
+                    .ToList();
+
+                var file = context.driveFiles
+                    .FirstOrDefault(f => sharedFile.Contains(f.Id) && f.Name == fileName && f.Id == fileId);
+
+                return file;
+            }
+        }
         public static void DeleteSharedFile(User loggedUser, int fileId)
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
-                var sharedFileRecord = context.driveFileUsers.FirstOrDefault(df => df.DriveFileId == fileId && df.UserId == loggedUser.Id);
+                var sharedFile = context.driveFileUsers.FirstOrDefault(df => df.DriveFileId == fileId && df.UserId == loggedUser.Id);
 
-                if (sharedFileRecord != null)
+                if (sharedFile != null)
                 {
-                    context.driveFileUsers.Remove(sharedFileRecord);
+                    context.driveFileUsers.Remove(sharedFile);
+                    context.SaveChanges();
+                }
+            }
+        }
+        public static void SavingASharedEditedFile(User loggedUser, string fileName, int fileId, List<string> newFileContent)
+        {
+            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
+            {
+                var sharedFile = context.driveFileUsers.FirstOrDefault(df => df.UserId == loggedUser.Id && df.DriveFileId == fileId);
+
+                if (sharedFile != null)
+                {
+                    var file = context.driveFiles.FirstOrDefault(f => f.Id == fileId);
+                    file.Text = string.Join("\n", newFileContent);
+                    file.LastChanges = DateTime.UtcNow;
                     context.SaveChanges();
                 }
             }

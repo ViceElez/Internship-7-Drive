@@ -2,7 +2,6 @@
 using Drive.Data.Entities.Models.Users;
 using Microsoft.EntityFrameworkCore;
 using Drive.Data.Entities;
-using System.Net.WebSockets;
 
 
 namespace Drive.Domain.Repositories
@@ -114,11 +113,11 @@ namespace Drive.Domain.Repositories
                 return folder.Id;
             }
         }
-        public static DriveFolder GetFolderById(int? folderId)
+        public static DriveFolder GetFolderById(User loggedUser,int? folderId)
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
-                var folder = context.driveFolders.FirstOrDefault(f => f.Id == folderId);
+                var folder = context.driveFolders.FirstOrDefault(f => f.Id == folderId && f.FolderUserId == loggedUser.Id);
                 return folder;
             }
         }

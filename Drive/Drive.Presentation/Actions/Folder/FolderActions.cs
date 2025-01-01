@@ -1,7 +1,5 @@
 ﻿using Drive.Data.Entities.Models.Users;
 using Drive.Presentation.Actions.Menus;
-using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
 
 namespace Drive.Presentation.Actions.Folder
 {

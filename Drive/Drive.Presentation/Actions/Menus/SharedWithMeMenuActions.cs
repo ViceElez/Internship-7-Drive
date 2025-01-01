@@ -1,10 +1,5 @@
 ﻿using Drive.Data.Entities.Models.Users;
 using Drive.Domain.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Drive.Presentation.Actions.Menus
 {
@@ -15,7 +10,7 @@ namespace Drive.Presentation.Actions.Menus
             while (true)
             {
                 Console.Clear();
-                var currentFolder = FolderRepositroy.GetFolderById(currentFolderId);
+                var currentFolder = FolderRepositroy.GetFolderById(loggedUser,currentFolderId);
                 if (currentFolder == null)
                     Console.WriteLine("Nalazite se u pocetnom folderu.\n");
                 else

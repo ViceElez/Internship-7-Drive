@@ -1,9 +1,6 @@
 ﻿using Drive.Data.Entities.Models.Users;
 using Drive.Presentation.Actions.Menus;
 using Drive.Presentation.Helper;
-using Microsoft.EntityFrameworkCore.ValueGeneration;
-using System.ComponentModel.DataAnnotations;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Drive.Presentation.Actions.File
 {
@@ -179,7 +176,7 @@ namespace Drive.Presentation.Actions.File
                             break;
 
                         case "spremanje i izlaz":
-                            Domain.Repositories.FileRepository.SavingAEditedFile(loggedUser, fileName, fileId, lines);
+                            Domain.Repositories.FileRepository.SavingASharedEditedFile(loggedUser, fileName, fileId, lines);
                             Console.WriteLine("Datoteka je spremljena.");
                             Console.ReadKey();
                             return;
@@ -349,6 +346,76 @@ namespace Drive.Presentation.Actions.File
         }
         public static void EditSharedFileContent(User loggedUser, int? currentFolderId)
         {
+            Console.Write("Upisite ime file-a koji zelite urediti:");
+            var fileName = Helper.InputValidation.SharedFileNameValidation(loggedUser, currentFolderId);
+
+            var fileId = 0;
+            if (Domain.Repositories.FileRepository.ReturnTheNumberOfSharedFilesWithSamename(loggedUser, fileName) > 1)
+                fileId = Helper.InputValidation.SharedFileIdValidation(loggedUser, fileName, currentFolderId);
+
+            if (Domain.Repositories.FileRepository.ReturnTheNumberOfFilesWithSamename(loggedUser, fileName) == 1)
+                fileId = Domain.Repositories.FileRepository.GetSharedFileId(loggedUser, fileName);
+
+            Console.Clear();
+            var fileToEdit = Domain.Repositories.FileRepository.GetSharedFile(loggedUser, fileName,fileId);
+            Console.WriteLine($"Uredivanje datoteke: {fileToEdit.Name}");
+            Console.WriteLine($"\nTrenutni tekst: {fileToEdit.Text}");
+
+            List<string> lines = new List<string>(fileToEdit.Text.Split('\n'));
+            string currentLine = string.Empty;
+
+            Console.WriteLine("Unesite tekst za spremanje. Koristite ':help' za popis komandi.");
+
+            while (true)
+            {
+                var keyInfo = Console.ReadKey(intercept: true);
+                char keyChar = keyInfo.KeyChar;
+
+                if (keyChar == ':')
+                {
+                    Console.WriteLine();
+                    string command = Console.ReadLine();
+
+                    switch (command.ToLower().Trim())
+                    {
+                        case "help":
+                            InputValidation.ListAllEditSharedFileFunctions();
+                            break;
+
+                        case "spremanje i izlaz":
+                            Domain.Repositories.FileRepository.SavingAEditedFile(loggedUser, fileName, fileId, lines);
+                            Console.WriteLine("Datoteka je spremljena.");
+                            Console.ReadKey();
+                            return;
+
+                        case "izlaz bez spremanja":
+                            Console.WriteLine("Izlaz bez spremanja.");
+                            Console.ReadKey();
+                            return;
+                        case "otvori komentare":
+                            Drive.Presentation.Actions.Comment.CommentAction.CommentMenu(loggedUser, fileId,currentFolderId);
+                            break;
+
+                        default:
+                            Console.WriteLine($"Nepoznata komanda: {command}");
+                            Console.ReadKey();
+                            break;
+                    }
+                }
+                else if (keyInfo.Key == ConsoleKey.Backspace)
+                {
+                    lines = Domain.Repositories.FileRepository.HandlingBackspaceFileEditings(loggedUser, fileName, fileId, lines, ref currentLine);
+                }
+                else if (keyInfo.Key == ConsoleKey.Enter)
+                {
+                    lines = Domain.Repositories.FileRepository.HandlingEnterFileEditings(loggedUser, fileName, fileId, lines, ref currentLine);
+                }
+                else
+                {
+                    currentLine += keyChar;
+                    Console.Write(keyChar);
+                }
+            }
 
         }
     }
