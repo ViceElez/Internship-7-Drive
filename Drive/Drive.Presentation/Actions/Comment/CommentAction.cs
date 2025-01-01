@@ -1,5 +1,7 @@
 ﻿using Drive.Data.Entities.Models.Users;
 using Drive.Domain.Repositories;
+using Drive.Presentation.Actions.Menus;
+using Drive.Presentation.Helper;
 
 namespace Drive.Presentation.Actions.Comment
 {
@@ -58,6 +60,28 @@ namespace Drive.Presentation.Actions.Comment
             }
             
         }
-        
+        public static void AddComment(User loggedUser, int fileId,int? currentFolderId)
+        {
+            Console.WriteLine("Unesite komentar:");
+            var content = Console.ReadLine().Trim();
+            CommentRepository.AddComment(loggedUser, fileId, content);
+            SharedWithMeMenuActions.SharedDiskMenu(loggedUser, currentFolderId);
+        }
+        public static void EditComment(User loggedUser, int fileId, int? currentFolderId)
+        {
+            Console.WriteLine("Unesite id komentara koji zelite urediti:");
+            var commentId = InputValidation.CommentIdValidation(loggedUser,currentFolderId,fileId);
+            Console.WriteLine("Unesite novi sadrzaj komentara:");
+            var content = Console.ReadLine().Trim();
+            CommentRepository.EditComment(fileId, commentId, content);
+            SharedWithMeMenuActions.SharedDiskMenu(loggedUser, currentFolderId);
+        }
+        public static void DeleteComment(User loggedUser, int fileId, int? currentFolderId)
+        {
+            Console.WriteLine("Unesite id komentara koji zelite izbrisati:");
+            var commentId = InputValidation.CommentIdValidation(loggedUser, currentFolderId, fileId);
+            CommentRepository.DeleteComments(fileId, commentId);
+            SharedWithMeMenuActions.SharedDiskMenu(loggedUser, currentFolderId);
+        }
     }
 }

@@ -433,5 +433,63 @@ namespace Drive.Presentation.Helper
         {
             Console.WriteLine("1. Dodaj komentar\n2. Uredi komentar\n3. Izbrisi komentar\n4. Izlaz");
         }
+        public static int CommentIdValidation(User loggedUser, int? currentFolderId,int fileId)
+        {
+            var validCommentId = int.TryParse(Console.ReadLine().Trim(), out int commentId);
+            while (true)
+            {
+                if (!validCommentId)
+                {
+                    Console.WriteLine("Upisani id mora biti broj.");
+                    var confirmForFolderName = Helper.InputValidation.ConfirmAndDelete();
+                    if (confirmForFolderName)
+                    {
+                        Console.Write("Upisite id komentara:");
+                        validCommentId = int.TryParse(Console.ReadLine(), out commentId);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Proces je prekinut.");
+                        Console.ReadKey();
+                        SharedWithMeMenuActions.SharedDiskMenu(loggedUser, currentFolderId);
+                    }
+                }
+                else if (commentId <= 0)
+                {
+                    Console.WriteLine("Id nemoze biti 0 ili negativan.");
+                    var confirmForFolderName = Helper.InputValidation.ConfirmAndDelete();
+                    if (confirmForFolderName)
+                    {
+                        Console.Write("Upisite id komentara:");
+                        validCommentId = int.TryParse(Console.ReadLine(), out commentId);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Proces je prekinut.");
+                        Console.ReadKey();
+                        SharedWithMeMenuActions.SharedDiskMenu(loggedUser, currentFolderId);
+                    }
+                }
+                else if (!Domain.Repositories.CommentRepository.CheckIfCommentExists(fileId, commentId))
+                {
+                    Console.WriteLine("Ne postoji komentar s tim id-om.");
+                    var confirmForFolderName = Helper.InputValidation.ConfirmAndDelete();
+                    if (confirmForFolderName)
+                    {
+                        Console.Write("Upisite id komentara:");
+                        validCommentId = int.TryParse(Console.ReadLine(), out commentId);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Proces je prekinut.");
+                        Console.ReadKey();
+                        SharedWithMeMenuActions.SharedDiskMenu(loggedUser, currentFolderId);
+                    }
+                }
+                else
+                    break;
+            }
+            return commentId;
+        }
     } 
 }
