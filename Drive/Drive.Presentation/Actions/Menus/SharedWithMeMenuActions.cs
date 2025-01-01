@@ -33,10 +33,10 @@ namespace Drive.Presentation.Actions.Menus
                         Drive.Presentation.Actions.Folder.FolderActions.EnterSharedFolder(loggedUser, currentFolderId);
                         break;
                     case "izbrisi mapu":
-
+                        Drive.Presentation.Actions.Folder.FolderActions.DeleteSharedFolder(loggedUser, currentFolderId);
                         break;
                     case "izbrisi datoteku":
-
+                        Drive.Presentation.Actions.File.FileActions.DeleteSharedFile(loggedUser, currentFolderId);
                         break;
                     case "uredi datoteku":
 

@@ -258,6 +258,49 @@ namespace Drive.Domain.Repositories
                 return false;
             }
         }
+        public static int ReturnTheNumberOfSharedFilesWithSamename(User loggedUser, string fileName)
+        {
+            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
+            {
+                var sharedFiles = context.driveFileUsers
+                    .Where(df => df.UserId == loggedUser.Id)
+                    .Select(df => df.DriveFileId)
+                    .ToList();
 
+                var filesWithSameName = context.driveFiles
+                    .Where(f => sharedFiles.Contains(f.Id) && f.Name == fileName)
+                    .ToList();
+
+                return filesWithSameName.Count;
+            }
+        }
+        public static int GetSharedFileId(User loggedUser, string fileName)
+        {
+            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
+            {
+                var sharedFile = context.driveFileUsers
+                    .Where(df => df.UserId == loggedUser.Id)
+                    .Select(df => df.DriveFileId)
+                    .ToList();
+
+                var file = context.driveFiles
+                    .FirstOrDefault(f => sharedFile.Contains(f.Id) && f.Name == fileName);
+
+                return file.Id;
+            }
+        }
+        public static void DeleteSharedFile(User loggedUser, int fileId)
+        {
+            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
+            {
+                var sharedFileRecord = context.driveFileUsers.FirstOrDefault(df => df.DriveFileId == fileId && df.UserId == loggedUser.Id);
+
+                if (sharedFileRecord != null)
+                {
+                    context.driveFileUsers.Remove(sharedFileRecord);
+                    context.SaveChanges();
+                }
+            }
+        }
     }
 }

@@ -300,7 +300,28 @@ namespace Drive.Presentation.Actions.Folder
         }
         public static void DeleteSharedFolder(User loggedUser, int? currentFolderId)
         {
+            Console.Write("Upisite ime foldera koji zelite izbrisati:");
+            var folderName = Helper.InputValidation.SharedFolderNameValidation(loggedUser, currentFolderId);
 
+            var folderId = 0;
+            if (Domain.Repositories.FolderRepositroy.ReturnTheNumberOfSharedFoldersWithSamename(loggedUser, folderName) > 1)
+                folderId = Helper.InputValidation.SharedFolderIdValidation(loggedUser, folderName, currentFolderId);
+
+            if(Helper.InputValidation.ConfirmAndDelete())
+            {
+                if (Domain.Repositories.FolderRepositroy.ReturnTheNumberOfSharedFoldersWithSamename(loggedUser, folderName) == 1)
+                    folderId = Domain.Repositories.FolderRepositroy.GetSharedFolderId(loggedUser, folderName);
+                Domain.Repositories.FolderRepositroy.DeleteSharedFolder(loggedUser, folderId);
+                Console.WriteLine("Folder uspjesno izbrisan.");
+                Console.ReadKey();
+                SharedWithMeMenuActions.SharedDiskMenu(loggedUser, currentFolderId);
+            }
+            else
+            {
+                Console.WriteLine("Proces je prekinut.");
+                Console.ReadKey();
+                SharedWithMeMenuActions.SharedDiskMenu(loggedUser, currentFolderId);
+            }
         }
 
 

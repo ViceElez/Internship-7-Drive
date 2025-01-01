@@ -210,7 +210,7 @@ namespace Drive.Presentation.Actions.File
                 }
             }
         }
-        public static void ShareFile(User loggedUser,int? currentFolderId)
+        public static void ShareFile(User loggedUser, int? currentFolderId)
         {
             Console.WriteLine("Upisite ime file-a koji zelite podijeliti:");
             var fileName = Helper.InputValidation.FileNameValidation(loggedUser, currentFolderId);
@@ -227,7 +227,7 @@ namespace Drive.Presentation.Actions.File
             {
                 Console.Write("Upisite email korisnika kojem zelite podijeliti file(kada dodate sve zeljene korisnike upisite 'stop'):");
                 var userEmail = Console.ReadLine().Trim();
-                if(userEmail.ToLower().Trim() == "stop")
+                if (userEmail.ToLower().Trim() == "stop")
                     break;
                 else
                 {
@@ -320,7 +320,36 @@ namespace Drive.Presentation.Actions.File
             MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
 
         }
+        public static void DeleteSharedFile(User loggedUser, int? currentFolderId)
+        {
+            Console.Write("Upisite ime foldera koji zelite izbrisati:");
+            var fileName = Helper.InputValidation.SharedFileNameValidation(loggedUser, currentFolderId);
+
+            var fileId = 0;
+            if (Domain.Repositories.FileRepository.ReturnTheNumberOfSharedFilesWithSamename(loggedUser, fileName) > 1)
+                fileId = Helper.InputValidation.SharedFileIdValidation(loggedUser, fileName, currentFolderId);
+
+            if (Helper.InputValidation.ConfirmAndDelete())
+            {
+                if (Domain.Repositories.FileRepository.ReturnTheNumberOfSharedFilesWithSamename(loggedUser, fileName) == 1)
+                    fileId = Domain.Repositories.FileRepository.GetSharedFileId(loggedUser, fileName);
+                Domain.Repositories.FileRepository.DeleteSharedFile(loggedUser, fileId);
+                Console.WriteLine("File uspjesno izbrisan.");
+                Console.ReadKey();
+                SharedWithMeMenuActions.SharedDiskMenu(loggedUser, currentFolderId);
+            }
+            else
+            {
+                Console.WriteLine("Proces je prekinut.");
+                Console.ReadKey();
+                SharedWithMeMenuActions.SharedDiskMenu(loggedUser, currentFolderId);
+            }
 
 
+        }
+        public static void EditSharedFileContent(User loggedUser, int? currentFolderId)
+        {
+
+        }
     }
 }

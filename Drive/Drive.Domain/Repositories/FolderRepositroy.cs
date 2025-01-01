@@ -2,6 +2,7 @@
 using Drive.Data.Entities.Models.Users;
 using Microsoft.EntityFrameworkCore;
 using Drive.Data.Entities;
+using System.Net.WebSockets;
 
 
 namespace Drive.Domain.Repositories
@@ -218,7 +219,7 @@ namespace Drive.Domain.Repositories
         }
         public static int GetSharedFolderId(User loggedUser, string folderName)
         {
-            using(var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
+            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
                 var folder = context.driveFolderUsers
                     .Where(fu => fu.UserId == loggedUser.Id)
@@ -227,5 +228,17 @@ namespace Drive.Domain.Repositories
                 return folder.Id;
             }
         }
+        public static void DeleteSharedFolder(User loggedUser, int folderId)
+        {
+            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
+            {
+                var sharedFolder = context.driveFolderUsers.FirstOrDefault(fu => fu.UserId == loggedUser.Id && fu.DriveFolderId == folderId);
+                if(sharedFolder != null)
+                {
+                    context.driveFolderUsers.Remove(sharedFolder);
+                    context.SaveChanges();
+                }
+            }
+        } 
     }
 }
