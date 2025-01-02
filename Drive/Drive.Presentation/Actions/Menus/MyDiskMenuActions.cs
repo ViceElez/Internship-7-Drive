@@ -57,6 +57,26 @@ namespace Drive.Presentation.Actions.Menus
                         Drive.Presentation.Actions.File.FileActions.ChangeFileName(loggedUser, currentFolderId);
                         break;
 
+                    case "podijeli datoteku":
+                        Drive.Presentation.Actions.File.FileActions.ShareFile(loggedUser, currentFolderId);
+                        break;
+
+                    case "podijeli mapu":
+                        Drive.Presentation.Actions.Folder.FolderActions.ShareFolder(loggedUser, currentFolderId);
+                        break;
+
+                    case "prestani dijelit mapu":
+                        Drive.Presentation.Actions.Folder.FolderActions.StopSharingFolder(loggedUser, currentFolderId);
+                        break;
+
+                    case "prestani dijelit datoteku":
+                        Drive.Presentation.Actions.File.FileActions.StopSharingFile(loggedUser, currentFolderId);
+                        break;
+
+                    case "navigacija":
+
+                        break;
+
                     case "help":
                         Helper.InputValidation.ListAllFunctions();
                         break;
@@ -64,9 +84,6 @@ namespace Drive.Presentation.Actions.Menus
                     case "povratak":
                         DriveMenuActions.DriveMenu(loggedUser);
                         return;
-                    case "navigacija":
-
-                        break;
 
                     default:
                         Console.WriteLine("Nepostojeca komanda. Zelite li vidjeti popis svih komandi? (da/ne)");

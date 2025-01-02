@@ -8,16 +8,27 @@ namespace Drive.Domain.Repositories
     public class CommentRepository:BaseRepository
     {
         public CommentRepository(DriveDbContext dbContext) : base(dbContext) { }
-        public static List<DriveComments> ListAllComments(int fileId)
+        public static List<DriveComments> GetAllComments(int fileId)
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
-                return context.driveComments
-                .Where(c => c.FileId == fileId)
-                .OrderBy(c => c.CreatedAt) 
-                .ToList();
+                var comments = context.driveComments
+                    .Include(c => c.User) // Ensure we include the User details
+                    .Where(c => c.FileId == fileId)
+                    .ToList();
+
+                if (comments == null || comments.Count == 0)
+                {
+                    return null; // Return null if no comments are found
+                }
+
+                return comments; // Return the list of comments
             }
         }
+
+
+
+
         public static bool CheckIfCommentExists(int fileId, int commentId)
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
@@ -44,8 +55,7 @@ namespace Drive.Domain.Repositories
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
-                var comment = context.driveComments
-                .FirstOrDefault(c => c.FileId == fileId && c.Id == commentId);
+                var comment = context.driveComments.AsTracking().FirstOrDefault(c => c.FileId == fileId && c.Id == commentId);
                 if (comment != null)
                 {
                     comment.Content = content;

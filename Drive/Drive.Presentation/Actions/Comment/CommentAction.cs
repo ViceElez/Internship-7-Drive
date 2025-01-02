@@ -7,33 +7,43 @@ namespace Drive.Presentation.Actions.Comment
 {
     public class CommentAction
     {
-        public static void CommentMenu(User loggedUser, int fileId, int? currentFolderId)
+        public static void CommentSharedMenu(User loggedUser, int fileId, int? currentFolderId)
         {
             while (true)
             {
                 Console.Clear();
-                foreach (var comment in CommentRepository.ListAllComments(fileId))
+                Console.WriteLine("Komentari:");
+                var listOfComments = CommentRepository.GetAllComments(fileId);
+                if(listOfComments == null || listOfComments.Count == 0)
                 {
-                    Console.WriteLine($"{comment.User.Id} - {comment.User.Email} - {comment.CreatedAt}");
-                    Console.WriteLine($"{comment.Content}\n");
+                    Console.WriteLine("Nema komentara.");
                 }
-                Console.WriteLine("Upisite komandu za rad s komentarima:");
+                else
+                {
+                    foreach (var comment in CommentRepository.GetAllComments(fileId))
+                    {
+                        Console.WriteLine($"{comment.Id} - {comment.User.Email} - {comment.CreatedAt}\n{comment.Content}\n");
+                    }
+                }
+                Console.WriteLine("\nUpisite komandu za rad s komentarima('help' za ispisat sve komande):");
                 var commadOption = Console.ReadLine().Trim().ToLower();
                 switch (commadOption)
                 {
                     case "dodaj komentar":
-                        //implementacija
+                        AddComment(loggedUser, fileId, currentFolderId);
                         break;
                     case "uredi komentar":
-                        //implementacija
+                        EditComment(loggedUser, fileId, currentFolderId);
                         break;
                     case "izbrisi komentar":
-                        //implementacija
+                        DeleteComment(loggedUser, fileId, currentFolderId);
                         break;
                     case "izlaz":
-                       // Drive.Presentation.Actions.Menus.SharedWithMeMenuActions.SharedDiskMenu(loggedUser,currentFolderId);
-                        return;
-
+                        SharedWithMeMenuActions.SharedDiskMenu(loggedUser, currentFolderId);
+                        break;
+                    case "help":
+                        InputValidation.ListAllCommentFunctions();
+                        break;
                     default:
                         Console.WriteLine("Nepostojeca komanda. Zelite li vidjeti popis svih komandi? (da/ne)");
                         while (true)
@@ -60,12 +70,75 @@ namespace Drive.Presentation.Actions.Comment
             }
             
         }
+        public static void CommentMenu(User loggedUser, int fileId, int? currentFolderId)
+        {
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("Komentari:");
+                var listOfComments = CommentRepository.GetAllComments(fileId);
+                if (listOfComments == null || listOfComments.Count == 0)
+                {
+                    Console.WriteLine("Nema komentara.");
+                }
+                else
+                {
+                    foreach (var comment in CommentRepository.GetAllComments(fileId))
+                    {
+                        Console.WriteLine($"{comment.Id} - {comment.User.Email} - {comment.CreatedAt}\n{comment.Content}\n");
+                    }
+                }
+                Console.WriteLine("\nUpisite komandu za rad s komentarima('help' za ispisat sve komande):");
+                var commadOption = Console.ReadLine().Trim().ToLower();
+                switch (commadOption)
+                {
+                    case "dodaj komentar":
+                        AddComment(loggedUser, fileId, currentFolderId);
+                        break;
+                    case "uredi komentar":
+                        EditComment(loggedUser, fileId, currentFolderId);
+                        break;
+                    case "izbrisi komentar":
+                        DeleteComment(loggedUser, fileId, currentFolderId);
+                        break;
+                    case "izlaz":
+                        MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
+                        break;
+                    case "help":
+                        InputValidation.ListAllCommentFunctions();
+                        break;
+                    default:
+                        Console.WriteLine("Nepostojeca komanda. Zelite li vidjeti popis svih komandi? (da/ne)");
+                        while (true)
+                        {
+                            var showHelp = Console.ReadLine().Trim().ToLower();
+                            if (showHelp == "da")
+                            {
+                                Helper.InputValidation.ListAllCommentFunctions();
+                                break;
+                            }
+                            else if (showHelp == "ne")
+                            {
+                                Console.WriteLine("Ponovo unesite komandu.");
+                                break;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Nepostojeca komanda.");
+                                break;
+                            }
+                        }
+                        break;
+                }
+            }
+
+        }
         public static void AddComment(User loggedUser, int fileId,int? currentFolderId)
         {
             Console.WriteLine("Unesite komentar:");
             var content = Console.ReadLine().Trim();
             CommentRepository.AddComment(loggedUser, fileId, content);
-            SharedWithMeMenuActions.SharedDiskMenu(loggedUser, currentFolderId);
+            CommentMenu(loggedUser, fileId, currentFolderId);
         }
         public static void EditComment(User loggedUser, int fileId, int? currentFolderId)
         {
@@ -74,14 +147,14 @@ namespace Drive.Presentation.Actions.Comment
             Console.WriteLine("Unesite novi sadrzaj komentara:");
             var content = Console.ReadLine().Trim();
             CommentRepository.EditComment(fileId, commentId, content);
-            SharedWithMeMenuActions.SharedDiskMenu(loggedUser, currentFolderId);
+            CommentMenu(loggedUser,fileId,currentFolderId);
         }
         public static void DeleteComment(User loggedUser, int fileId, int? currentFolderId)
         {
             Console.WriteLine("Unesite id komentara koji zelite izbrisati:");
             var commentId = InputValidation.CommentIdValidation(loggedUser, currentFolderId, fileId);
             CommentRepository.DeleteComments(fileId, commentId);
-            SharedWithMeMenuActions.SharedDiskMenu(loggedUser, currentFolderId);
+            CommentMenu(loggedUser, fileId, currentFolderId);
         }
     }
 }

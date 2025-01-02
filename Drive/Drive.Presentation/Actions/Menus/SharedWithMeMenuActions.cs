@@ -10,7 +10,7 @@ namespace Drive.Presentation.Actions.Menus
             while (true)
             {
                 Console.Clear();
-                var currentFolder = FolderRepositroy.GetFolderById(loggedUser,currentFolderId);
+                var currentFolder = FolderRepositroy.GetSharedFolderById(loggedUser,currentFolderId);
                 if (currentFolder == null)
                     Console.WriteLine("Nalazite se u pocetnom folderu.\n");
                 else
@@ -34,7 +34,7 @@ namespace Drive.Presentation.Actions.Menus
                         Drive.Presentation.Actions.File.FileActions.DeleteSharedFile(loggedUser, currentFolderId);
                         break;
                     case "uredi datoteku":
-
+                        Drive.Presentation.Actions.File.FileActions.EditSharedFileContent(loggedUser, currentFolderId);
                         break;
                     case "navigacija":
 
@@ -42,6 +42,10 @@ namespace Drive.Presentation.Actions.Menus
                     case "help":
                         Helper.InputValidation.ListAllSharedFunctions();
                         break;
+                    case "povratak":
+                        DriveMenuActions.DriveMenu(loggedUser);
+                        return;
+
                     default:
                         Console.WriteLine("Nepostojeca komanda. Zelite li vidjeti popis svih komandi? (da/ne)");
                      while (true)

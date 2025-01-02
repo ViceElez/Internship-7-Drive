@@ -97,8 +97,8 @@ namespace Drive.Domain.Repositories
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
-                var folder = context.driveFolders.FirstOrDefault(f => f.Name == oldFolderName && f.Id == folderId && f.FolderUserId == loggedUser.Id);
-                if (folder != null)
+                var folder = context.driveFolders.AsTracking().FirstOrDefault(f => f.Id == folderId && f.Name == oldFolderName && f.FolderUserId == loggedUser.Id);
+                if(folder!= null)
                 {
                     folder.Name = newFolderName;
                     context.SaveChanges();
@@ -121,6 +121,17 @@ namespace Drive.Domain.Repositories
                 return folder;
             }
         }
+        public static DriveFolder GetSharedFolderById(User loggedUser,int? folderId)
+        {
+            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
+            {
+                var folder = context.driveFolderUsers
+                    .Where(fu => fu.UserId == loggedUser.Id)
+                    .Select(fu => fu.DriveFolder)
+                    .FirstOrDefault(f => f.Id == folderId);
+                return folder;
+            }
+        }
         public static bool ShareFolder(User loggedUser, int folderId, string email)
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
@@ -130,17 +141,38 @@ namespace Drive.Domain.Repositories
                 {
                     return false;
                 }
+
                 var folder = context.driveFolders.FirstOrDefault(f => f.Id == folderId && f.FolderUserId == loggedUser.Id);
                 if (folder == null)
                 {
                     return false;
                 }
-                var sharedFolder = new DriveFolderUser
+                var sharedFolder = context.driveFolderUsers.FirstOrDefault(sf => sf.DriveFolderId == folderId && sf.UserId == user.Id);
+                if (sharedFolder != null)
+                {
+                    return false;
+                }
+                sharedFolder = new DriveFolderUser
                 {
                     DriveFolderId = folderId,
                     UserId = user.Id
                 };
                 context.driveFolderUsers.Add(sharedFolder);
+
+                var filesInFolder = context.driveFiles.Where(f => f.FolderId == folderId).ToList();
+                foreach (var file in filesInFolder)
+                {
+                    var sharedFile = context.driveFileUsers.FirstOrDefault(sf => sf.DriveFileId == file.Id && sf.UserId == user.Id);
+                    if (sharedFile == null) 
+                    {
+                        sharedFile = new DriveFileUser
+                        {
+                            DriveFileId = file.Id,
+                            UserId = user.Id
+                        };
+                        context.driveFileUsers.Add(sharedFile);
+                    }
+                }
                 context.SaveChanges();
                 return true;
             }
@@ -238,6 +270,24 @@ namespace Drive.Domain.Repositories
                     context.SaveChanges();
                 }
             }
-        } 
+        }
+        public static void StopSharingFolder(User loggedUser, int folderId)
+        {
+            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
+            {
+                var sharedFolderEntries = context.driveFolderUsers
+                    .Where(df => df.DriveFolderId == folderId && df.UserId != loggedUser.Id)
+                    .ToList();
+
+                if (sharedFolderEntries.Any())
+                {
+                    context.driveFolderUsers.RemoveRange(sharedFolderEntries);
+                    context.SaveChanges();
+                }
+            }
+        }
+
+
+
     }
 }

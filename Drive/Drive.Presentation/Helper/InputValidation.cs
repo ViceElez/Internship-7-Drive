@@ -432,6 +432,7 @@ namespace Drive.Presentation.Helper
         public static void ListAllCommentFunctions()
         {
             Console.WriteLine("1. Dodaj komentar\n2. Uredi komentar\n3. Izbrisi komentar\n4. Izlaz");
+            Console.ReadKey();
         }
         public static int CommentIdValidation(User loggedUser, int? currentFolderId,int fileId)
         {

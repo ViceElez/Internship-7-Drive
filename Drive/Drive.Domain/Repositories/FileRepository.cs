@@ -97,7 +97,7 @@ namespace Drive.Domain.Repositories
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
-                var file = context.driveFiles.FirstOrDefault(f => f.Name == oldFileName && f.Id == fileId && f.FileUserId == loggedUser.Id);
+                var file = context.driveFiles.AsTracking().FirstOrDefault(f => f.Name == oldFileName && f.FileUserId == loggedUser.Id && f.Id == fileId);
                 if (file != null)
                 {
                     file.Name = newFileName;
@@ -125,13 +125,12 @@ namespace Drive.Domain.Repositories
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
-                var file = context.driveFiles.FirstOrDefault(f => f.Name == fileName && f.FileUserId == loggedUser.Id && f.Id == fileId);
-                if (file != null)
-                {
+                    var file = context.driveFiles.AsTracking().FirstOrDefault(f => f.Name == fileName && f.FileUserId == loggedUser.Id && f.Id == fileId);
+
                     file.Text = string.Join("\n", newFileContent);
                     file.LastChanges = DateTime.UtcNow;
+
                     context.SaveChanges();
-                }
             }
         }
         public static List<string> HandlingBackspaceFileEditings(User loggedUser, string fileName, int fileId, List<string> newFileContent, ref string currentLine)
@@ -193,15 +192,24 @@ namespace Drive.Domain.Repositories
         }
         public static void ListAllSharedFiles(User loggedUser, int? currentFolderId)
         {
-            using (var context= new DriveDbContext(new DbContextOptions<DriveDbContext>()))
+            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
-                var sharedFiles = context.driveFileUsers.Where(df => df.UserId == loggedUser.Id) .Select(df => df.DriveFileId).ToList();
+                var sharedFiles = context.driveFileUsers
+                    .Where(df => df.UserId == loggedUser.Id)
+                    .Select(df => df.DriveFileId)
+                    .ToList();
 
-                var orderedFiles = context.driveFiles.Where(f => sharedFiles.Contains(f.Id)) .OrderByDescending(f => f.LastChanges).ToList();
+                var orderedFiles = context.driveFiles
+                    .Where(f => sharedFiles.Contains(f.Id) && f.FolderId == currentFolderId)
+                    .OrderByDescending(f => f.LastChanges)
+                    .ToList();
 
-                foreach (var file in orderedFiles)
+                if (orderedFiles.Any())
                 {
-                    Console.WriteLine($"{file.Id}-{file.Name}");
+                    foreach (var file in orderedFiles)
+                    {
+                        Console.WriteLine($"{file.Id} - {file.Name}");
+                    }
                 }
             }
         }
@@ -320,16 +328,43 @@ namespace Drive.Domain.Repositories
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
-                var sharedFile = context.driveFileUsers.FirstOrDefault(df => df.UserId == loggedUser.Id && df.DriveFileId == fileId);
+                var sharedFile = context.driveFileUsers
+                    .AsTracking()
+                    .FirstOrDefault(df => df.UserId == loggedUser.Id && df.DriveFileId == fileId);
 
-                if (sharedFile != null)
+                if (sharedFile == null)
+                    return;
+                
+                var file = context.driveFiles
+                    .AsTracking()
+                    .FirstOrDefault(f => f.Id == fileId);
+
+                if (file == null)
+                    return;
+                
+
+                file.Text = string.Join("\n", newFileContent);
+                file.LastChanges = DateTime.UtcNow;
+                context.SaveChanges();
+            }
+        }
+        public static void StopSharingFile(User loggedUser, int fileId)
+        {
+            using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
+            {
+                var sharedFileEntries = context.driveFileUsers
+                    .Where(df => df.DriveFileId == fileId && df.UserId != loggedUser.Id)
+                    .ToList();
+
+                if (sharedFileEntries.Any())
                 {
-                    var file = context.driveFiles.FirstOrDefault(f => f.Id == fileId);
-                    file.Text = string.Join("\n", newFileContent);
-                    file.LastChanges = DateTime.UtcNow;
+                    context.driveFileUsers.RemoveRange(sharedFileEntries);
                     context.SaveChanges();
                 }
             }
         }
+
+
+
     }
 }

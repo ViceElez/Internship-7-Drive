@@ -176,7 +176,7 @@ namespace Drive.Presentation.Actions.File
                             break;
 
                         case "spremanje i izlaz":
-                            Domain.Repositories.FileRepository.SavingASharedEditedFile(loggedUser, fileName, fileId, lines);
+                            Domain.Repositories.FileRepository.SavingAEditedFile(loggedUser, fileName, fileId, lines);
                             Console.WriteLine("Datoteka je spremljena.");
                             Console.ReadKey();
                             return;
@@ -185,6 +185,9 @@ namespace Drive.Presentation.Actions.File
                             Console.WriteLine("Izlaz bez spremanja.");
                             Console.ReadKey();
                             return;
+                        case "otvori komentare":
+                            Drive.Presentation.Actions.Comment.CommentAction.CommentMenu(loggedUser, fileId, currentFolderId);
+                            break;
 
                         default:
                             Console.WriteLine($"Nepoznata komanda: {command}");
@@ -317,9 +320,34 @@ namespace Drive.Presentation.Actions.File
             MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
 
         }
+        public static void StopSharingFile(User loggedUser, int? currentFolderId)
+        {
+            Console.Write("Upisite ime file-a koji zelite prestati dijeliti:");
+            var fileName = Helper.InputValidation.FileNameValidation(loggedUser, currentFolderId);
+
+            var fileId = 0;
+            if (Domain.Repositories.FileRepository.ReturnTheNumberOfFilesWithSamename(loggedUser, fileName) > 1)
+                fileId = Helper.InputValidation.FileIdValidation(loggedUser, fileName, currentFolderId);
+
+            if (Helper.InputValidation.ConfirmAndDelete())
+            {
+                if (Domain.Repositories.FileRepository.ReturnTheNumberOfFilesWithSamename(loggedUser, fileName) == 1)
+                    fileId = Domain.Repositories.FileRepository.GetFileId(loggedUser, fileName);
+                Domain.Repositories.FileRepository.StopSharingFile(loggedUser, fileId);
+                Console.WriteLine("File se uspjesno prestao dijeliti.");
+                Console.ReadKey();
+                MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
+            }
+            else
+            {
+                Console.WriteLine("Proces je prekinut.");
+                Console.ReadKey();
+                MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
+            }
+        }
         public static void DeleteSharedFile(User loggedUser, int? currentFolderId)
         {
-            Console.Write("Upisite ime foldera koji zelite izbrisati:");
+            Console.Write("Upisite ime file-a koji zelite izbrisati:");
             var fileName = Helper.InputValidation.SharedFileNameValidation(loggedUser, currentFolderId);
 
             var fileId = 0;
@@ -353,7 +381,7 @@ namespace Drive.Presentation.Actions.File
             if (Domain.Repositories.FileRepository.ReturnTheNumberOfSharedFilesWithSamename(loggedUser, fileName) > 1)
                 fileId = Helper.InputValidation.SharedFileIdValidation(loggedUser, fileName, currentFolderId);
 
-            if (Domain.Repositories.FileRepository.ReturnTheNumberOfFilesWithSamename(loggedUser, fileName) == 1)
+            if (Domain.Repositories.FileRepository.ReturnTheNumberOfSharedFilesWithSamename(loggedUser, fileName) == 1)
                 fileId = Domain.Repositories.FileRepository.GetSharedFileId(loggedUser, fileName);
 
             Console.Clear();
@@ -383,7 +411,7 @@ namespace Drive.Presentation.Actions.File
                             break;
 
                         case "spremanje i izlaz":
-                            Domain.Repositories.FileRepository.SavingAEditedFile(loggedUser, fileName, fileId, lines);
+                            Domain.Repositories.FileRepository.SavingASharedEditedFile(loggedUser, fileName, fileId, lines);
                             Console.WriteLine("Datoteka je spremljena.");
                             Console.ReadKey();
                             return;
@@ -393,7 +421,7 @@ namespace Drive.Presentation.Actions.File
                             Console.ReadKey();
                             return;
                         case "otvori komentare":
-                            Drive.Presentation.Actions.Comment.CommentAction.CommentMenu(loggedUser, fileId,currentFolderId);
+                            Drive.Presentation.Actions.Comment.CommentAction.CommentSharedMenu(loggedUser, fileId,currentFolderId);
                             break;
 
                         default:

@@ -164,7 +164,7 @@ namespace Drive.Presentation.Actions.Folder
         }
         public static void ShareFolder(User loggedUser,int? currentFolderId)
         {
-            Console.Write("Upisite ime foldera u koji zelite podijeliti:");
+            Console.Write("Upisite ime foldera koji zelite podijeliti:");
             var folderName = Helper.InputValidation.FolderNameValidation(loggedUser, currentFolderId);
 
             var folderId = 0;
@@ -198,7 +198,7 @@ namespace Drive.Presentation.Actions.Folder
                             {
                                 Console.WriteLine("Proces je prekinut.");
                                 Console.ReadKey();
-                                MainMenuActions.MainMenu();
+                                MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
                             }
                         }
                         else if (!Helper.InputValidation.IsValid(userEmail))
@@ -214,7 +214,7 @@ namespace Drive.Presentation.Actions.Folder
                             {
                                 Console.WriteLine("Proces je prekinut.");
                                 Console.ReadKey();
-                                MainMenuActions.MainMenu();
+                                MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
                             }
                         }
                         else if (!Drive.Domain.Repositories.UserRepository.EmailExists(userEmail))
@@ -230,7 +230,7 @@ namespace Drive.Presentation.Actions.Folder
                             {
                                 Console.WriteLine("Proces je prekinut.");
                                 Console.ReadKey();
-                                MainMenuActions.MainMenu();
+                                MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
                             }
 
                         }
@@ -247,7 +247,7 @@ namespace Drive.Presentation.Actions.Folder
                             {
                                 Console.WriteLine("Proces je prekinut.");
                                 Console.ReadKey();
-                                MainMenuActions.MainMenu();
+                                MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
                             }
                         }
                         else
@@ -271,6 +271,31 @@ namespace Drive.Presentation.Actions.Folder
             }
             MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
         }
+        public static void StopSharingFolder(User loggedUser,int? currentFolderId)
+        { 
+            Console.Write("Upisite ime foldera koji zelite prestati dijeliti:");
+            var folderName = Helper.InputValidation.FolderNameValidation(loggedUser, currentFolderId);
+
+            var folderId = 0;
+            if (Domain.Repositories.FolderRepositroy.ReturnTheNumberOfFoldersWithSamename(loggedUser, folderName) > 1)
+                folderId = Helper.InputValidation.FolderIdValidation(loggedUser, folderName, currentFolderId);
+
+            if (Helper.InputValidation.ConfirmAndDelete())
+            {
+                if (Domain.Repositories.FolderRepositroy.ReturnTheNumberOfFoldersWithSamename(loggedUser, folderName) == 1)
+                    folderId = Domain.Repositories.FolderRepositroy.GetFolderId(loggedUser, folderName);
+                Domain.Repositories.FolderRepositroy.StopSharingFolder(loggedUser, folderId);
+                Console.WriteLine("Uspjesan prestanak dijeljenja u folder.");
+                Console.ReadKey();
+                MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
+            }
+            else
+            {
+                Console.WriteLine("Proces je prekinut.");
+                Console.ReadKey();
+                MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
+            }
+        }
         public static void EnterSharedFolder(User loggedUser, int? currentFolderId)
         {
             Console.Write("Upisite ime foldera u koji zelite uci:");
@@ -279,7 +304,7 @@ namespace Drive.Presentation.Actions.Folder
             var folderId = 0;
             if (Domain.Repositories.FolderRepositroy.ReturnTheNumberOfSharedFoldersWithSamename(loggedUser, folderName) > 1)
                 folderId = Helper.InputValidation.SharedFolderIdValidation(loggedUser, folderName, currentFolderId);
-
+             
             if (Helper.InputValidation.ConfirmAndDelete())
             {
                 if (Domain.Repositories.FolderRepositroy.ReturnTheNumberOfSharedFoldersWithSamename(loggedUser, folderName) == 1)
@@ -293,7 +318,7 @@ namespace Drive.Presentation.Actions.Folder
             {
                 Console.WriteLine("Proces je prekinut.");
                 Console.ReadKey();
-                MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
+                SharedWithMeMenuActions.SharedDiskMenu(loggedUser, currentFolderId);
             }
         }
         public static void DeleteSharedFolder(User loggedUser, int? currentFolderId)
@@ -321,7 +346,5 @@ namespace Drive.Presentation.Actions.Folder
                 SharedWithMeMenuActions.SharedDiskMenu(loggedUser, currentFolderId);
             }
         }
-
-
     }
 }
