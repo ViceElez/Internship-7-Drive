@@ -233,7 +233,7 @@ namespace Drive.Presentation.Helper
         }
         public static void ListAllEditFileFunctions()
         {
-            Console.WriteLine("1.:Spremanje i izlaz\n2.:Izlaz bez spremanja");
+            Console.WriteLine("1.:Spremanje i izlaz\n2.:Izlaz bez spremanja\n3. Otvori komentare");
         }
         public static string SharedFolderNameValidation(User loggedUser, int? currentFolderId)
         {
@@ -426,10 +426,6 @@ namespace Drive.Presentation.Helper
         {
             Console.WriteLine("1. Udi u mapu\n2. Uredi datoteku\n3. Izbrisi mapu\n4. Izbrisi datoteku\n5. Povratak");
             Console.ReadKey();
-        }
-        public static void ListAllEditSharedFileFunctions()
-        {
-            Console.WriteLine("1.:Spremanje i izlaz\n2.:Izlaz bez spremanja\n3. Otvori komentare");
         }
         public static void ListAllCommentFunctions()
         {

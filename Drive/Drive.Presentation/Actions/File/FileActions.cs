@@ -407,7 +407,7 @@ namespace Drive.Presentation.Actions.File
                     switch (command.ToLower().Trim())
                     {
                         case "help":
-                            InputValidation.ListAllEditSharedFileFunctions();
+                            InputValidation.ListAllEditFileFunctions();
                             break;
 
                         case "spremanje i izlaz":

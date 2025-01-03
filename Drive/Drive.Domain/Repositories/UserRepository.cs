@@ -67,7 +67,7 @@ namespace Drive.Domain.Repositories
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
-                var user = context.Users.FirstOrDefault(u => u.Email == loggedUser.Email);
+                var user = context.Users.AsTracking().FirstOrDefault(u => u.Email == loggedUser.Email);
                 user.Email = newEmail;
                 context.SaveChanges();
                 return user;
@@ -77,7 +77,7 @@ namespace Drive.Domain.Repositories
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
-                var user = context.Users.FirstOrDefault(u => u.Email == loggedUser.Email);
+                var user = context.Users.AsTracking().FirstOrDefault(u => u.Email == loggedUser.Email);
                 user.Password = newPassword;
                 context.SaveChanges();
             }
