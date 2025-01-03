@@ -72,6 +72,8 @@ namespace Drive.Presentation.Actions.LogIn
                 if (string.IsNullOrEmpty(loginPassword))
                 {
                     Console.WriteLine("Lozinka nemoze biti prazna.");
+                    Console.WriteLine("Proces logiranja zakljucan 30 sekundi.");
+                    Thread.Sleep(30000);
                     var confirmForPassword = Helper.InputValidation.ConfirmAndDelete();
                     if (confirmForPassword)
                     {
@@ -88,6 +90,7 @@ namespace Drive.Presentation.Actions.LogIn
                 else if (!Drive.Domain.Repositories.UserRepository.ConfirmPassword(loginEmail, loginPassword))
                 {
                     Console.WriteLine("Pogresna lozinka");
+                    Console.WriteLine("Proces logiranja zakljucan 30 sekundi.");
                     Thread.Sleep(30000);
                     var confirmForPassword = Helper.InputValidation.ConfirmAndDelete();
                     if (confirmForPassword)

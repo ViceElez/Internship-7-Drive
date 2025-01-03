@@ -260,7 +260,7 @@ namespace Drive.Presentation.Actions.Folder
                             }
                             else
                             {
-                                Console.WriteLine("File je vec podijeljen s tim korisnikom.");
+                                Console.WriteLine("Folder je vec podijeljen s tim korisnikom.");
                                 Console.ReadKey();
                                 break;
                             }
@@ -285,7 +285,7 @@ namespace Drive.Presentation.Actions.Folder
                 if (Domain.Repositories.FolderRepositroy.ReturnTheNumberOfFoldersWithSamename(loggedUser, folderName) == 1)
                     folderId = Domain.Repositories.FolderRepositroy.GetFolderId(loggedUser, folderName);
                 Domain.Repositories.FolderRepositroy.StopSharingFolder(loggedUser, folderId);
-                Console.WriteLine("Uspjesan prestanak dijeljenja u folder.");
+                Console.WriteLine("Uspjesan prestanak dijeljenja foldera.");
                 Console.ReadKey();
                 MyDiskMenuActions.MyDiskMenu(loggedUser, currentFolderId);
             }

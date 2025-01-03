@@ -9,16 +9,19 @@ namespace Drive.Domain.Repositories
     public class FolderRepositroy : BaseRepository
     {
         public FolderRepositroy(DriveDbContext dbContext) : base(dbContext) { }
-        public static void ListAllFolders(User loggedUser, int? currentFolderId)
+        public static List<DriveFolder> ListAllFolders(User loggedUser, int? currentFolderId)
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
                 var folders = context.driveFolders.Where(f => f.FolderUserId == loggedUser.Id && f.ParentFolderId == currentFolderId)
                     .OrderBy(f => f.Name).ToList();
-                foreach (var folder in folders)
+
+                if (folders == null || folders.Count == 0)
                 {
-                    Console.WriteLine($"{folder.Id}-{folder.Name}");
+                    return null;
                 }
+                return folders;
+
             }
         }
         public static bool CheckIfFolderExistsById(int IdOfFolder, User loggedUser, int? currentFolderId)
@@ -82,15 +85,16 @@ namespace Drive.Domain.Repositories
                 return folders.Count;
             }
         }
-        public static void ListAllFoldersWithSameName(User loggedUser, string folderName, int? currentFolderId)
+        public static List<DriveFolder> ListAllFoldersWithSameName(User loggedUser, string folderName, int? currentFolderId)
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
                 var folders = context.driveFolders.Where(f => f.FolderUserId == loggedUser.Id && f.Name == folderName && f.ParentFolderId == currentFolderId).ToList();
-                foreach (var folder in folders)
+                if (folders == null || folders.Count == 0)
                 {
-                    Console.WriteLine($"{folder.Id}-{folder.Name}");
+                    return null;
                 }
+                return folders;
             }
         }
         public static void ChangeFolderName(User loggedUser, string oldFolderName, string newFolderName, int folderId)
@@ -98,7 +102,7 @@ namespace Drive.Domain.Repositories
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
                 var folder = context.driveFolders.AsTracking().FirstOrDefault(f => f.Id == folderId && f.Name == oldFolderName && f.FolderUserId == loggedUser.Id);
-                if(folder!= null)
+                if (folder != null)
                 {
                     folder.Name = newFolderName;
                     context.SaveChanges();
@@ -113,7 +117,7 @@ namespace Drive.Domain.Repositories
                 return folder.Id;
             }
         }
-        public static DriveFolder GetFolderById(User loggedUser,int? folderId)
+        public static DriveFolder GetFolderById(User loggedUser, int? folderId)
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
@@ -121,7 +125,7 @@ namespace Drive.Domain.Repositories
                 return folder;
             }
         }
-        public static DriveFolder GetSharedFolderById(User loggedUser,int? folderId)
+        public static DriveFolder GetSharedFolderById(User loggedUser, int? folderId)
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
@@ -139,19 +143,21 @@ namespace Drive.Domain.Repositories
                 var user = context.Users.FirstOrDefault(u => u.Email == email);
                 if (user == null)
                 {
-                    return false;
+                    return false; 
                 }
 
                 var folder = context.driveFolders.FirstOrDefault(f => f.Id == folderId && f.FolderUserId == loggedUser.Id);
                 if (folder == null)
                 {
-                    return false;
+                    return false; 
                 }
+
                 var sharedFolder = context.driveFolderUsers.FirstOrDefault(sf => sf.DriveFolderId == folderId && sf.UserId == user.Id);
                 if (sharedFolder != null)
                 {
-                    return false;
+                    return false; 
                 }
+
                 sharedFolder = new DriveFolderUser
                 {
                     DriveFolderId = folderId,
@@ -159,22 +165,51 @@ namespace Drive.Domain.Repositories
                 };
                 context.driveFolderUsers.Add(sharedFolder);
 
-                var filesInFolder = context.driveFiles.Where(f => f.FolderId == folderId).ToList();
-                foreach (var file in filesInFolder)
-                {
-                    var sharedFile = context.driveFileUsers.FirstOrDefault(sf => sf.DriveFileId == file.Id && sf.UserId == user.Id);
-                    if (sharedFile == null) 
-                    {
-                        sharedFile = new DriveFileUser
-                        {
-                            DriveFileId = file.Id,
-                            UserId = user.Id
-                        };
-                        context.driveFileUsers.Add(sharedFile);
-                    }
-                }
+                ShareFilesInFolder(context, folderId, user.Id);
+
+                ShareSubFoldersInFolder(context, folderId, user.Id);
+
                 context.SaveChanges();
                 return true;
+            }
+        }
+        private static void ShareFilesInFolder(DriveDbContext context, int folderId, int userId)
+        {
+            var filesInFolder = context.driveFiles.Where(f => f.FolderId == folderId).ToList();
+
+            foreach (var file in filesInFolder)
+            {
+                var sharedFile = context.driveFileUsers.FirstOrDefault(sf => sf.DriveFileId == file.Id && sf.UserId == userId);
+                if (sharedFile == null)
+                {
+                    sharedFile = new DriveFileUser
+                    {
+                        DriveFileId = file.Id,
+                        UserId = userId
+                    };
+                    context.driveFileUsers.Add(sharedFile);
+                }
+            }
+        }
+        private static void ShareSubFoldersInFolder(DriveDbContext context, int folderId, int userId)
+        {
+            var subFolders = context.driveFolders.Where(f => f.ParentFolderId == folderId).ToList();
+
+            foreach (var subFolder in subFolders)
+            {
+                var sharedSubFolder = context.driveFolderUsers.FirstOrDefault(sf => sf.DriveFolderId == subFolder.Id && sf.UserId == userId);
+                if (sharedSubFolder == null)
+                {
+                    sharedSubFolder = new DriveFolderUser
+                    {
+                        DriveFolderId = subFolder.Id,
+                        UserId = userId
+                    };
+                    context.driveFolderUsers.Add(sharedSubFolder);
+                }
+
+                ShareFilesInFolder(context, subFolder.Id, userId);
+                ShareSubFoldersInFolder(context, subFolder.Id, userId);
             }
         }
         public static int ReturnTheNumberOfSharedFoldersWithSamename(User loggedUser, string folderName)
@@ -189,7 +224,7 @@ namespace Drive.Domain.Repositories
                 return sharedFolders.Count;
             }
         }
-        public static void ListAllSharedFolders(User loggedUser, int? currentFolderId)
+        public static List<DriveFolder> ListAllSharedFolders(User loggedUser, int? currentFolderId)
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
@@ -200,13 +235,14 @@ namespace Drive.Domain.Repositories
                     .OrderBy(f => f.Name)
                     .ToList();
 
-                foreach (var folder in sharedFolders)
-                {
-                    Console.WriteLine($"{folder.Id}-{folder.Name}");
-                }
+               if(sharedFolders == null || sharedFolders.Count == 0)
+                    return null;
+
+
+                return sharedFolders;
             }
         }
-        public static void ListAllSharedFoldersWithSameName(User loggedUser, string folderName, int? currentFolderId)
+        public static List<DriveFolder> ListAllSharedFoldersWithSameName(User loggedUser, string folderName, int? currentFolderId)
         {
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
@@ -216,10 +252,10 @@ namespace Drive.Domain.Repositories
                      .Where(f => f.Name == folderName && f.ParentFolderId == currentFolderId)
                      .OrderBy(f => f.Name)
                      .ToList();
-                foreach (var folder in sharedFolders)
-                {
-                    Console.WriteLine($"{folder.Id}-{folder.Name}");
-                }
+
+                if (sharedFolders == null || sharedFolders.Count == 0)
+                    return null;
+                return sharedFolders;
             }
         }
         public static bool CheckIfFolderExistsInSharedFoldersById(User loggedUser, int folderId, int? currentFolderId)
@@ -264,7 +300,7 @@ namespace Drive.Domain.Repositories
             using (var context = new DriveDbContext(new DbContextOptions<DriveDbContext>()))
             {
                 var sharedFolder = context.driveFolderUsers.FirstOrDefault(fu => fu.UserId == loggedUser.Id && fu.DriveFolderId == folderId);
-                if(sharedFolder != null)
+                if (sharedFolder != null)
                 {
                     context.driveFolderUsers.Remove(sharedFolder);
                     context.SaveChanges();

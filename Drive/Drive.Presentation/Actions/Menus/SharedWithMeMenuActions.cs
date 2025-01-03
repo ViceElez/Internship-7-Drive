@@ -15,12 +15,33 @@ namespace Drive.Presentation.Actions.Menus
                     Console.WriteLine("Nalazite se u pocetnom folderu.\n");
                 else
                     Console.WriteLine($"Nalazite se u {currentFolder.Name} folderu.\n");
-                Console.WriteLine("Vasi folderi su:");
-                FolderRepositroy.ListAllSharedFolders(loggedUser, currentFolderId);
+
+                var folders = FolderRepositroy.ListAllSharedFolders(loggedUser, currentFolderId);
+                if (folders != null)
+                {
+                    Console.WriteLine("Vasi folderi su:");
+                    foreach (var folder in folders)
+                    {
+                        Console.WriteLine($"{folder.Id} - {folder.Name}");
+                    }
+                }
+                else
+                    Console.WriteLine("Nemate foldera u ovom folderu");
+
                 Console.WriteLine();
-                Console.WriteLine("Vasi file-ovi su:");
-                FileRepository.ListAllSharedFiles(loggedUser, currentFolderId);
-                Console.WriteLine("Upisite komandu za rad s datotekama (ili upisite 'help' za popis komandi):");
+                var files = FileRepository.ListAllSharedFiles(loggedUser, currentFolderId);
+                if (files != null)
+                {
+                    Console.WriteLine("\nVasi file-ovi su:");
+                    foreach (var file in files)
+                    {
+                        Console.WriteLine($"{file.Id} - {file.Name}");
+                    }
+                }
+                else
+                    Console.WriteLine("\nNemate file-ova u ovom folderu");
+
+                Console.WriteLine("\nUpisite komandu za rad s datotekama (ili upisite 'help' za popis komandi):");
                 var commandOption = Console.ReadLine().Trim().ToLower();
                 switch (commandOption)
                 {
@@ -35,9 +56,6 @@ namespace Drive.Presentation.Actions.Menus
                         break;
                     case "uredi datoteku":
                         Drive.Presentation.Actions.File.FileActions.EditSharedFileContent(loggedUser, currentFolderId);
-                        break;
-                    case "navigacija":
-
                         break;
                     case "help":
                         Helper.InputValidation.ListAllSharedFunctions();

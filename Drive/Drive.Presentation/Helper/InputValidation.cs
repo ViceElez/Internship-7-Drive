@@ -59,9 +59,9 @@ namespace Drive.Presentation.Helper
         public static int FileIdValidation(User loggedUser, string fileName, int? currentFolderId)
         {
             var fileId = 0;
-            Console.WriteLine("Postoji vise file-ova s tim imenom.");
-            Domain.Repositories.FileRepository.ListAllFilesWithSameName(loggedUser, fileName,currentFolderId);
-            Console.Write("Unesite id file-a:");
+            foreach (var file in Drive.Domain.Repositories.FileRepository.ListAllFilesWithSameName(loggedUser, fileName, currentFolderId))
+                Console.WriteLine($"{file.Id} - {file.Name}");
+            Console.Write("\nUnesite id file-a:");
             var isIdCorrect = int.TryParse(Console.ReadLine(), out fileId);
 
             while (true)
@@ -145,9 +145,10 @@ namespace Drive.Presentation.Helper
         public static int FolderIdValidation(User loggedUser, string folderName, int? currentFolderId)
         {
             Console.WriteLine("Postoji vise foldera s istim imenom");
-            Domain.Repositories.FolderRepositroy.ListAllFoldersWithSameName(loggedUser, folderName,currentFolderId);
+            foreach (var folder in Domain.Repositories.FolderRepositroy.ListAllFoldersWithSameName(loggedUser, folderName, currentFolderId))
+                Console.WriteLine($"{folder.Id} - {folder.Name}");
 
-            Console.Write("Upisite id foldera kojeg zelite izbrisati:");
+            Console.Write("\nUpisite id foldera kojeg zelite izbrisati:");
             var isIdCorrect = int.TryParse(Console.ReadLine(), out var folderId);
 
             while (true)
@@ -227,7 +228,7 @@ namespace Drive.Presentation.Helper
         {
             Console.WriteLine("1. Stvori mapu\n2. Stvori datoteku\n3. Udi u mapu\n4. Uredi datoteku" +
                 "\n5. Izbrisi mapu\n6. Izbrisi datoteku\n7. Promijeni naziv mape\n8. Promijeni naziv datoteke\n9. Podijeli mapu\n" +
-                "10. Podijeli datoteku\n11. Prestani dijelit mapu\n12. Prestani dijelit datoteku\n13. Navigacija\n14. Povratak");
+                "10. Podijeli datoteku\n11. Prestani dijelit mapu\n12. Prestani dijelit datoteku\n13. Povratak");
             Console.ReadKey();
         }
         public static void ListAllEditFileFunctions()
@@ -257,9 +258,10 @@ namespace Drive.Presentation.Helper
         public static int SharedFolderIdValidation(User loggedUser, string folderName, int? currentFolderId)
         {
             Console.WriteLine("Postoji vise foldera s istim imenom");
-            Domain.Repositories.FolderRepositroy.ListAllSharedFoldersWithSameName(loggedUser, folderName, currentFolderId);
+            foreach(var folder in Domain.Repositories.FolderRepositroy.ListAllSharedFoldersWithSameName(loggedUser, folderName, currentFolderId))
+                Console.WriteLine($"{folder.Id} - {folder.Name}");
 
-            Console.Write("Upisite id foldera kojeg zelite izbrisati:");
+            Console.Write("\nUpisite id foldera kojeg zelite izbrisati:");
             var isIdCorrect = int.TryParse(Console.ReadLine(), out var folderId);
 
             while (true)
@@ -342,9 +344,9 @@ namespace Drive.Presentation.Helper
         public static int SharedFileIdValidation(User loggedUser, string fileName, int? currentFolderId)
         {
             var fileId = 0;
-            Console.WriteLine("Postoji vise file-ova s tim imenom.");
-            Domain.Repositories.FileRepository.ListAllSharedFilesWithTheSameName(loggedUser, fileName, currentFolderId);
-            Console.Write("Unesite id file-a:");
+            foreach (var file in Domain.Repositories.FileRepository.ListAllSharedFilesWithTheSameName(loggedUser, fileName, currentFolderId))
+                Console.WriteLine($"{file.Id} - {file.Name}");
+            Console.Write("\nUnesite id file-a:");
             var isIdCorrect = int.TryParse(Console.ReadLine(), out fileId);
 
             while (true)
@@ -422,7 +424,7 @@ namespace Drive.Presentation.Helper
         }
         public static void ListAllSharedFunctions()
         {
-            Console.WriteLine("1. Udi u mapu\n2. Uredi datoteku\n3. Izbrisi mapu\n4. Izbrisi datoteku\n5. Navigacija\n6. Povratak");
+            Console.WriteLine("1. Udi u mapu\n2. Uredi datoteku\n3. Izbrisi mapu\n4. Izbrisi datoteku\n5. Povratak");
             Console.ReadKey();
         }
         public static void ListAllEditSharedFileFunctions()

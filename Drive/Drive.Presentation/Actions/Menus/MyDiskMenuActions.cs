@@ -1,5 +1,6 @@
 ﻿using Drive.Data.Entities.Models.Users;
 using Drive.Domain.Repositories;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Drive.Presentation.Actions.Menus
 {
@@ -10,17 +11,37 @@ namespace Drive.Presentation.Actions.Menus
             while (true)
             {
                 Console.Clear();
-                var currentFolder = FolderRepositroy.GetFolderById(loggedUser,currentFolderId);
+                var currentFolder = FolderRepositroy.GetFolderById(loggedUser, currentFolderId);
                 if (currentFolder == null)
                     Console.WriteLine("Nalazite se u pocetnom folderu.\n");
                 else
                     Console.WriteLine($"Nalazite se u {currentFolder.Name} folderu.\n");
-                Console.WriteLine("Vasi folderi su:");
-                FolderRepositroy.ListAllFolders(loggedUser, currentFolderId);
+
+                var folders = FolderRepositroy.ListAllFolders(loggedUser, currentFolderId);
+                if (folders != null)
+                {
+                    Console.WriteLine("Vasi folderi su:");
+                    foreach (var folder in folders)
+                    {
+                        Console.WriteLine($"{folder.Id} - {folder.Name}");
+                    }
+                }
+                else
+                    Console.WriteLine("\nNemate foldera u ovom folderu");
                 Console.WriteLine();
-                Console.WriteLine("Vasi file-ovi su:");
-                FileRepository.ListAllFiles(loggedUser, currentFolderId);
-                Console.WriteLine("Upisite komandu za rad s datotekama (ili upisite 'help' za popis komandi):");
+                var files = FileRepository.ListAllFiles(loggedUser, currentFolderId);
+                if (files != null)
+                {
+                    Console.WriteLine("\nVasi file-ovi su:");
+                    foreach (var file in files)
+                    {
+                        Console.WriteLine($"{file.Id} - {file.Name}");
+                    }
+                }
+                else
+                    Console.WriteLine("Nemate file-ova u ovom folderu");
+
+                Console.WriteLine("\nUpisite komandu za rad s datotekama (ili upisite 'help' za popis komandi):");
                 var commandOption = Console.ReadLine().Trim().ToLower();
 
                 switch (commandOption)
@@ -71,10 +92,6 @@ namespace Drive.Presentation.Actions.Menus
 
                     case "prestani dijelit datoteku":
                         Drive.Presentation.Actions.File.FileActions.StopSharingFile(loggedUser, currentFolderId);
-                        break;
-
-                    case "navigacija":
-
                         break;
 
                     case "help":
