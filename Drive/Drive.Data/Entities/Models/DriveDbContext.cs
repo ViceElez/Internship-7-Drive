@@ -63,27 +63,24 @@ namespace Drive.Data.Entities
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=Drive;User Id=postgres;Password=gR4)0Lo2Q;")
+                var connString = CreateDbContext();
+                optionsBuilder.UseNpgsql(connString)
                     .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             }
         }
-    }
 
-    public class DriveDbContextFactory : IDesignTimeDbContextFactory<DriveDbContext>
-    {
-        public DriveDbContext CreateDbContext(string[] args)
+        public static string? CreateDbContext()
         {
+            var currDir = Directory.GetCurrentDirectory();
+            var presPath=currDir.Substring(0, currDir.IndexOf("\\bin"));
+
             var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
+                .SetBasePath(presPath)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
-
+ 
             var connectionString = configuration.GetConnectionString("Drive");
-
-            var optionsBuilder = new DbContextOptionsBuilder<DriveDbContext>();
-            optionsBuilder.UseNpgsql(connectionString);
-
-            return new DriveDbContext(optionsBuilder.Options);
+            return connectionString;
         }
     }
 }
